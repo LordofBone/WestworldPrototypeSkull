@@ -1,3 +1,6 @@
 [submodule "Lakul"]
 	path = Lakul
 	url = https://github.com/LordofBone/Lakul.git
+[submodule "ChattingGPT"]
+	path = ChattingGPT
+	url = https://github.com/LordofBone/ChattingGPT
