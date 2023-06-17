@@ -1,0 +1,3 @@
+[submodule "Lakul"]
+	path = Lakul
+	url = https://github.com/LordofBone/Lakul.git
