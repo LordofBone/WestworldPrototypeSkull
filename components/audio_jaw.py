@@ -5,11 +5,6 @@ from threading import Thread
 from playsound import playsound
 from hardware.jaw_controller import JawController
 
-
-def calculate_rms(data, max_rms):
-    return min(np.sqrt(np.mean(data ** 2)), max_rms)
-
-
 def play_audio(audio_file):
     playsound(audio_file)
 
