@@ -1,9 +1,12 @@
-import numpy as np
 import time
-import pyaudio
 from threading import Thread
+
+import numpy as np
+import pyaudio
 from playsound import playsound
+
 from hardware.jaw_controller import JawController
+
 
 def play_audio(audio_file):
     playsound(audio_file)
