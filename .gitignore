@@ -1,3 +1,5 @@
 .idea/
 misc/*
+audio/*
+!audio/test.wav
 __pycache__
