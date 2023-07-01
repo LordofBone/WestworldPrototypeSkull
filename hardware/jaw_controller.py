@@ -2,14 +2,12 @@ import time
 import logging
 from threading import Thread
 from config.skull_config import open_pulse_width, close_pulse_width
-from inventorhatmini import InventorHATMini, SERVO_1
+from hardware.inventor_hat_controller import InventorHATCoreInit
 
 
 class JawController(Thread):
-    def __init__(self, servo_id=SERVO_1):
+    def __init__(self, ):
         Thread.__init__(self)
-        self.board = InventorHATMini(init_leds=False)
-        self.s = self.board.servos[servo_id]
         self.keep_running = True
         self._open_pulse_width = open_pulse_width
         self._close_pulse_width = close_pulse_width
@@ -26,7 +24,7 @@ class JawController(Thread):
         Set the pulse width directly.
         :param pulse_width: The pulse width in microseconds.
         """
-        self.s.value(pulse_width)
+        InventorHATCoreInit.s.value(pulse_width)
         time.sleep(0.5)
 
     def open_jaw(self, pulse_width=None):
