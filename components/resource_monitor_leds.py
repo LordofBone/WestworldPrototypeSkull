@@ -1,7 +1,7 @@
 import time
 import psutil
 import threading
-from inventorhatmini import InventorHATMini, NUM_LEDS
+from hardware.inventor_hat_controller import InventorHATCoreInit
 
 
 class LedResourceMonitor:
@@ -11,7 +11,6 @@ class LedResourceMonitor:
     INTERPOLATION_SPEED = 0.1  # Speed of interpolation (higher is faster)
 
     def __init__(self):
-        self.board = InventorHATMini()
         self.current_mem_percentage = 0.0
         self.current_cpu_percentage = 0.0
         self.stop_event = threading.Event()
@@ -36,14 +35,14 @@ class LedResourceMonitor:
 
             hue = 0.33 * (1.0 - self.current_cpu_percentage)
 
-            for i in range(NUM_LEDS):
-                if float(i) / NUM_LEDS <= self.current_mem_percentage:
-                    self.board.leds.set_hsv(i, hue, 1.0, self.current_mem_percentage, show=self.AUTO_SHOW)
+            for i in range(InventorHATCoreInit.NUM_LEDS):
+                if float(i) / InventorHATCoreInit.NUM_LEDS <= self.current_mem_percentage:
+                    InventorHATCoreInit.leds.set_hsv(i, hue, 1.0, self.current_mem_percentage, show=self.AUTO_SHOW)
                 else:
-                    self.board.leds.set_hsv(i, 0, 0, 0)
+                    InventorHATCoreInit.leds.set_hsv(i, 0, 0, 0)
 
             if not self.AUTO_SHOW:
-                self.board.leds.show()
+                InventorHATCoreInit.leds.show()
 
             self.sleep_until(start_time + self.UPDATE_RATE)
 
@@ -54,7 +53,7 @@ class LedResourceMonitor:
     def stop(self):
         self.stop_event.set()
         self.thread.join()
-        self.board.leds.clear()
+        InventorHATCoreInit.leds.clear()
 
 
 if __name__ == "__main__":
