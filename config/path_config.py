@@ -15,3 +15,9 @@ vertex_shader_path = os.path.join(current_dir, '..', 'rendering', 'shaders', 'de
 fragment_shader_path = os.path.join(current_dir, '..', 'rendering', 'shaders', 'default', 'lighting_toneMapping.frag')
 
 test_audio_path = os.path.join(current_dir, '..', 'audio', 'test.wav')
+
+lakul_dir = os.path.join(current_dir, '..', 'Lakul')
+
+chatting_gpt_dir = os.path.join(current_dir, '..', 'ChattingGPT')
+
+event_hive_dir = os.path.join(current_dir, '..', 'EventHive')

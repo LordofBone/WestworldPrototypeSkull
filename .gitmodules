@@ -4,3 +4,6 @@
 [submodule "ChattingGPT"]
 	path = ChattingGPT
 	url = https://github.com/LordofBone/ChattingGPT
+[submodule "EventHive"]
+	path = EventHive
+	url = https://github.com/LordofBone/EventHive.git
