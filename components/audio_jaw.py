@@ -122,16 +122,25 @@ class AudioJawSync:
         logging.debug("Audio, closing jaw")
         self.servo_controller.set_pulse_width(self.min_pulse_width)
 
-    def start(self, audio_file):
+    def start(self, audio_file=None, seconds_to_analyze=0):
         # Start audio analysis in a separate thread
         audio_analysis_thread = Thread(target=self.analyze_audio)
         audio_analysis_thread.daemon = False  # Daemon thread will exit when the main program exits
         audio_analysis_thread.start()
 
-        self.analyzing = True
+        if audio_file is None:
+            self.analyzing = True
 
-        # Play the audio file in the main thread
-        play_audio(audio_file)
+            # Wait for the specified number of seconds
+            time.sleep(seconds_to_analyze)
 
-        # Stop analyzing when audio is done playing
-        self.analyzing = False
+            # Stop analyzing when time has elapsed
+            self.analyzing = False
+        else:
+            self.analyzing = True
+
+            # Play the audio file in the main thread
+            play_audio(audio_file)
+
+            # Stop analyzing when audio is done playing
+            self.analyzing = False
