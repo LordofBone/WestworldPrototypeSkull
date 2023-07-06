@@ -1,4 +1,5 @@
 import os
+import sys
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -21,3 +22,9 @@ lakul_dir = os.path.join(current_dir, '..', 'Lakul')
 chatting_gpt_dir = os.path.join(current_dir, '..', 'ChattingGPT')
 
 event_hive_dir = os.path.join(current_dir, '..', 'EventHive')
+
+sys.path.append(lakul_dir)
+
+sys.path.append(chatting_gpt_dir)
+
+sys.path.append(event_hive_dir)
