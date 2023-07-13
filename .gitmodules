@@ -7,3 +7,6 @@
 [submodule "EventHive"]
 	path = EventHive
 	url = https://github.com/LordofBone/EventHive.git
+[submodule "nix-tts"]
+	path = nix-tts
+	url = https://github.com/rendchevi/nix-tts
