@@ -1,6 +1,7 @@
-import time
 import logging
+import time
 from threading import Thread
+
 from config.skull_config import open_pulse_width, close_pulse_width
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
