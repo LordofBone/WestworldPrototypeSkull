@@ -1,6 +1,8 @@
-import time
-import psutil
 import threading
+import time
+
+import psutil
+
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
 
@@ -27,11 +29,11 @@ class LedResourceMonitor:
             mem_info = psutil.virtual_memory()
             target_mem_percentage = mem_info.percent / 100.0
             self.current_mem_percentage += (
-                                                       target_mem_percentage - self.current_mem_percentage) * self.INTERPOLATION_SPEED
+                                                   target_mem_percentage - self.current_mem_percentage) * self.INTERPOLATION_SPEED
 
             target_cpu_percentage = psutil.cpu_percent(interval=0.1) / 100.0
             self.current_cpu_percentage += (
-                                                       target_cpu_percentage - self.current_cpu_percentage) * self.INTERPOLATION_SPEED
+                                                   target_cpu_percentage - self.current_cpu_percentage) * self.INTERPOLATION_SPEED
 
             hue = 0.33 * (1.0 - self.current_cpu_percentage)
 
