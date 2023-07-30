@@ -25,7 +25,7 @@ class JawController(Thread):
         Set the pulse width directly.
         :param pulse_width: The pulse width in microseconds.
         """
-        InventorHATCoreInit.s.value(pulse_width)
+        InventorHATCoreInit.servo.value(pulse_width)
         time.sleep(0.5)
 
     def open_jaw(self, pulse_width=None):

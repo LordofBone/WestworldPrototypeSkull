@@ -1,6 +1,5 @@
 import logging
 import time
-from functools import partial
 from threading import Thread
 
 import numpy as np
@@ -8,13 +7,16 @@ import pyaudio
 
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import AudioEngineAccess
-from config.custom_events import MovementEvent
-from config.path_config import test_audio_path, tts_audio_path
+from config.custom_events import MovementEvent, MicrowaveControllerEvent
 from hardware.jaw_controller import JawController
+
+logger = logging.getLogger(__name__)
 
 
 class AudioJawSync(EventActor):
-    def __post_init__(self):
+    def __init__(self, event_queue):
+        super().__init__(event_queue)
+
         self.p = pyaudio.PyAudio()
         self.input_device = int(self.find_usb_microphone_device())
 
@@ -28,6 +30,8 @@ class AudioJawSync(EventActor):
         self.data = None
 
         self.hw_accel = False
+
+        self.seconds_to_analyze = 30
 
         # Audio settings
         self.sample_rates = [8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 384000]
@@ -90,13 +94,13 @@ class AudioJawSync(EventActor):
                 # This chunk size is not supported. Continue checking the next one.
                 logging.debug(f"  Chunk size {chunk_size} is NOT supported: {err}")
 
-    def set_jaw_position(self, pulse_width):
+    def set_jaw_position(self, pulse_width, event_type=None, event_data=None):
         self.servo_controller.set_pulse_width(pulse_width)
 
-    def close_jaw(self):
+    def close_jaw(self, event_type=None, event_data=None):
         self.set_jaw_position(self.min_pulse_width)
 
-    def open_jaw(self):
+    def open_jaw(self, event_type=None, event_data=None):
         self.set_jaw_position(self.max_pulse_width)
 
     def calculate_rms_on_cpu(self):
@@ -111,60 +115,81 @@ class AudioJawSync(EventActor):
                              frames_per_buffer=self.CHUNK,
                              input_device_index=self.input_device)
 
-        while self.analyzing:
-            start_time = time.time()  # Record the start time
+        try:
+            while self.analyzing:
+                start_time = time.time()  # Record the start time
 
-            # Read data
-            self.data = np.frombuffer(stream.read(self.CHUNK, exception_on_overflow=False), dtype=np.int16)
+                # Read data
+                self.data = np.frombuffer(stream.read(self.CHUNK, exception_on_overflow=False), dtype=np.int16)
 
-            # Calculate RMS
-            self.calculate_rms_on_cpu()
+                # Calculate RMS
+                self.calculate_rms_on_cpu()
 
-            # Check if RMS exceeds the threshold
-            if self.rms > self.min_rms:
-                # Normalize RMS value to desired pulse width range
-                normalized_rms = self.rms / self.max_rms
-                pulse_width = (normalized_rms * (self.max_pulse_width - self.min_pulse_width)) + self.min_pulse_width
+                # Check if RMS exceeds the threshold
+                if self.rms > self.min_rms:
+                    # Normalize RMS value to desired pulse width range
+                    normalized_rms = self.rms / self.max_rms
+                    pulse_width = (normalized_rms * (
+                                self.max_pulse_width - self.min_pulse_width)) + self.min_pulse_width
 
-                logging.debug(f"RMS: {self.rms} | Pulse width: {pulse_width}")
+                    logging.debug(f"RMS: {self.rms} | Pulse width: {pulse_width}")
 
-                # Set pulse width
-                self.set_jaw_position(pulse_width)
-            else:
-                logging.debug("RMS below threshold, closing jaw")
-                self.close_jaw()
+                    # Set pulse width
+                    self.set_jaw_position(pulse_width)
+                else:
+                    logging.debug("RMS below threshold, closing jaw")
+                    self.close_jaw()
 
-            # Print processing time
-            end_time = time.time()  # Record the end time
-            processing_time = end_time - start_time
-            logging.debug(f"Processing time: {processing_time:.6f} seconds")
+                # Print processing time
+                end_time = time.time()  # Record the end time
+                processing_time = end_time - start_time
+                logging.debug(f"Processing time: {processing_time:.6f} seconds")
+        finally:
+            # Always close the stream when we're done to prevent resource leaks
+            logging.debug("Audio analysis done, closing jaw and audio stream")
+            self.close_jaw()
+            stream.close()
 
-        logging.debug("Audio, closing jaw")
-        self.close_jaw()
+            return True
 
-    def audio_to_jaw_movement(self, audio_file=None, seconds_to_analyze=0):
+        # logging.debug("Audio, closing jaw")
+        # self.close_jaw()
+
+    def audio_to_jaw_movement(self, event_type=None, event_data=None):
+        logging.debug("Audio to jaw movement")
         # Start audio analysis in a separate thread
         audio_analysis_thread = Thread(target=self.analyze_audio)
         audio_analysis_thread.daemon = False  # Daemon thread will exit when the main program exits
         audio_analysis_thread.start()
 
-        if audio_file is None:
-            self.analyzing = True
+        try:
 
-            # Wait for the specified number of seconds
-            time.sleep(seconds_to_analyze)
+            if event_data is None:
+                self.analyzing = True
 
-            # Stop analyzing when time has elapsed
-            self.analyzing = False
-        else:
-            self.analyzing = True
+                # Wait for the specified number of seconds
+                time.sleep(self.seconds_to_analyze)
 
-            # Set and play audio file from location
-            AudioEngineAccess.audio_file = audio_file
-            AudioEngineAccess.play_audio()
+                # Stop analyzing when time has elapsed
+                self.analyzing = False
+            else:
+                self.analyzing = True
+
+                # Set and play audio file from location
+                AudioEngineAccess.audio_file = event_data
+                AudioEngineAccess.play_audio()
+
+                # Stop analyzing when audio is done playing
+                self.analyzing = False
+
+        finally:
 
             # Stop analyzing when audio is done playing
             self.analyzing = False
+
+            self.produce_event(MicrowaveControllerEvent(["SCAN_MODE_ON"], 1))
+
+            return True
 
     def get_event_handlers(self):
         """
@@ -172,9 +197,7 @@ class AudioJawSync(EventActor):
         :return:
         """
         return {
-            ("JAW_TEST_AUDIO",): partial(self.audio_to_jaw_movement, audio_file=test_audio_path),
-            ("JAW_TTS_AUDIO",): partial(self.audio_to_jaw_movement, audio_file=tts_audio_path),
-            ("JAW_MIC_AUDIO",): self.audio_to_jaw_movement
+            "JAW_TTS_AUDIO": self.audio_to_jaw_movement
         }
 
     def get_consumable_events(self):

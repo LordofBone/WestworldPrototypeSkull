@@ -3,10 +3,11 @@ from pathlib import Path
 
 from playsound import playsound
 
+# todo: move to more generic config
 from config.nix_tts import audio_on, file_name
 
 # Initialize logger with the given name
-logger = logging.getLogger("voice-controller-logger")
+logger = logging.getLogger(__name__)
 
 
 def ensure_not_talking(func):
