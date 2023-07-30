@@ -3,3 +3,8 @@ misc/*
 audio/*
 !audio/test.wav
 __pycache__
+models/deterministic/*
+!models/deterministic/.gitkeep
+models/stochastic/*
+!models/stochastic/.gitkeep
+config/fakeyou_config.py
