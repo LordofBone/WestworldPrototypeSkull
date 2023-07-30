@@ -41,9 +41,25 @@ class TTSEvent(Event):
         return self.__class__
 
 
+class TTSDoneEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("TTS_Done_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
 class HardwareEvent(Event):
     def __init__(self, content, priority):
         super().__init__("Hardware_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
+class MicrowaveControllerEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("Microwave_Controller_Event", content, priority)
 
     def get_event_type(self):
         return self.__class__

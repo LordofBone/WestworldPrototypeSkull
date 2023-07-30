@@ -12,6 +12,7 @@ boot_text_test = "Welcome to the Arasaka Relic Cyberware System; Trauma Team Edi
 
 reboot_text = "Rebooting the system, please wait."
 shutdown_text = "Shutting down the system, please wait."
+demo_text = "Hello, my name is Skull. I am a conversational AI. I am a demo version of the full Skull AI."
 
 audio_on = True
 file_name = "tts_output.wav"
