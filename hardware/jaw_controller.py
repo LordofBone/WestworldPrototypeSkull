@@ -5,6 +5,9 @@ from threading import Thread
 from config.skull_config import open_pulse_width, close_pulse_width
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
+logger = logging.getLogger(__name__)
+logger.debug("Initialized")
+
 
 class JawController(Thread):
     def __init__(self, ):
@@ -31,12 +34,12 @@ class JawController(Thread):
     def open_jaw(self, pulse_width=None):
         pulse_width = pulse_width if pulse_width is not None else self._open_pulse_width
         self.set_pulse_width(pulse_width)
-        logging.debug("Jaw opened")
+        logger.debug("Jaw opened")
 
     def close_jaw(self, pulse_width=None):
         pulse_width = pulse_width if pulse_width is not None else self._close_pulse_width
         self.set_pulse_width(pulse_width)
-        logging.debug("Jaw closed")
+        logger.debug("Jaw closed")
 
     @property
     def open_pulse_width(self):

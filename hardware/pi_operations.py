@@ -5,7 +5,8 @@ from time import sleep
 from EventHive.event_hive_runner import EventActor
 from config.custom_events import HardwareEvent
 
-logger = logging.getLogger("pi-operations")
+logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class PiOperations(EventActor):

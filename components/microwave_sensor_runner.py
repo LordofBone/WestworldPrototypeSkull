@@ -9,6 +9,7 @@ from hardware.inventor_hat_controller import InventorHATCoreInit
 InventorHATCoreInit.board.gpio_pin_mode(0, InventorHATCoreInit.input_mode)
 
 logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class MicrowaveDetector(EventActor):
@@ -25,17 +26,17 @@ class MicrowaveDetector(EventActor):
             if InventorHATCoreInit.board.gpio_pin_value(0):
                 if self.scan_mode_enabled:
                     self.produce_event(DetectEvent(["HUMAN_DETECTED"], 1))
-                    logging.debug("Movement detected")
+                    logger.debug("Movement detected")
                     self.scan_mode_off()
                     sleep(2)
 
     def scan_mode_on(self, event_type=None, event_data=None):
-        logging.debug("SCAN MODE ON")
+        logger.debug("SCAN MODE ON")
         self.scan_mode_enabled = True
         return True
 
     def scan_mode_off(self, event_type=None, event_data=None):
-        logging.debug("SCAN MODE OFF")
+        logger.debug("SCAN MODE OFF")
         self.scan_mode_enabled = False
         return True
 

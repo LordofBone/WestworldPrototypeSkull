@@ -11,6 +11,7 @@ from config.custom_events import MovementEvent, MicrowaveControllerEvent
 from hardware.jaw_controller import JawController
 
 logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class AudioJawSync(EventActor):
@@ -49,15 +50,15 @@ class AudioJawSync(EventActor):
         # List all audio devices
         for i in range(self.p.get_device_count()):
             info = self.p.get_device_info_by_index(i)
-            logging.debug(f"Device index: {info['index']} - {info['name']}")
+            logger.debug(f"Device index: {info['index']} - {info['name']}")
 
             # Check if the device name contains "USB PnP Sound Device"
             if "USB PnP Sound Device" in info['name']:
-                logging.debug("Found USB PnP Sound Device at index:", info['index'])
+                logger.debug("Found USB PnP Sound Device at index:", info['index'])
                 return info['index']
 
         # If the device was not found
-        logging.debug("USB PnP Sound Device not found")
+        logger.debug("USB PnP Sound Device not found")
         raise Exception("USB PnP Sound Device not found, please ensure it is plugged in.")
 
     def find_compatible_sample_rate(self):
@@ -68,10 +69,10 @@ class AudioJawSync(EventActor):
                                                           input_device=self.input_device,
                                                           input_channels=1,
                                                           input_format=pyaudio.paInt16)
-                logging.debug(f"  Sample rate {rate} is supported: {is_supported}")
+                logger.debug(f"  Sample rate {rate} is supported: {is_supported}")
                 return rate
             except ValueError as err:
-                logging.debug(f"  Sample rate {rate} is NOT supported: {err}")
+                logger.debug(f"  Sample rate {rate} is NOT supported: {err}")
 
     # Check for supported chunk sizes
     def find_compatible_chunk_size(self):
@@ -88,11 +89,11 @@ class AudioJawSync(EventActor):
 
                 # If we reach this line, the chunk size is supported. Close the stream and return the chunk size.
                 stream.close()
-                logging.debug(f"  Chunk size {chunk_size} is supported.")
+                logger.debug(f"  Chunk size {chunk_size} is supported.")
                 return chunk_size
             except Exception as err:
                 # This chunk size is not supported. Continue checking the next one.
-                logging.debug(f"  Chunk size {chunk_size} is NOT supported: {err}")
+                logger.debug(f"  Chunk size {chunk_size} is NOT supported: {err}")
 
     def set_jaw_position(self, pulse_width, event_type=None, event_data=None):
         self.servo_controller.set_pulse_width(pulse_width)
@@ -130,33 +131,33 @@ class AudioJawSync(EventActor):
                     # Normalize RMS value to desired pulse width range
                     normalized_rms = self.rms / self.max_rms
                     pulse_width = (normalized_rms * (
-                                self.max_pulse_width - self.min_pulse_width)) + self.min_pulse_width
+                            self.max_pulse_width - self.min_pulse_width)) + self.min_pulse_width
 
-                    logging.debug(f"RMS: {self.rms} | Pulse width: {pulse_width}")
+                    logger.debug(f"RMS: {self.rms} | Pulse width: {pulse_width}")
 
                     # Set pulse width
                     self.set_jaw_position(pulse_width)
                 else:
-                    logging.debug("RMS below threshold, closing jaw")
+                    logger.debug("RMS below threshold, closing jaw")
                     self.close_jaw()
 
                 # Print processing time
                 end_time = time.time()  # Record the end time
                 processing_time = end_time - start_time
-                logging.debug(f"Processing time: {processing_time:.6f} seconds")
+                logger.debug(f"Processing time: {processing_time:.6f} seconds")
         finally:
             # Always close the stream when we're done to prevent resource leaks
-            logging.debug("Audio analysis done, closing jaw and audio stream")
+            logger.debug("Audio analysis done, closing jaw and audio stream")
             self.close_jaw()
             stream.close()
 
             return True
 
-        # logging.debug("Audio, closing jaw")
+        # logger.debug("Audio, closing jaw")
         # self.close_jaw()
 
     def audio_to_jaw_movement(self, event_type=None, event_data=None):
-        logging.debug("Audio to jaw movement")
+        logger.debug("Audio to jaw movement")
         # Start audio analysis in a separate thread
         audio_analysis_thread = Thread(target=self.analyze_audio)
         audio_analysis_thread.daemon = False  # Daemon thread will exit when the main program exits

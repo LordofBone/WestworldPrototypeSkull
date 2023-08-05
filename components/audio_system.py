@@ -8,6 +8,7 @@ from config.nix_tts import audio_on, file_name
 
 # Initialize logger with the given name
 logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 def ensure_not_talking(func):

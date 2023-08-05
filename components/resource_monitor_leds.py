@@ -7,6 +7,7 @@ import psutil
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
 logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class LedResourceMonitor:
@@ -56,21 +57,10 @@ class LedResourceMonitor:
 
     def start(self):
         self.thread.start()
-        logger.info("LED Resource Monitor started.")
+        logger.debug("LED Resource Monitor started.")
 
     def stop(self):
         self.stop_event.set()
         self.thread.join()
         InventorHATCoreInit.leds.clear()
-        logger.info("LED Resource Monitor stopped.")
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    led_monitor = LedResourceMonitor()
-    try:
-        led_monitor.start()
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        led_monitor.stop()
+        logger.debug("LED Resource Monitor stopped.")

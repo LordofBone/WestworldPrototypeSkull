@@ -7,8 +7,10 @@ from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectE
 from config.nix_tts import shutdown_text, reboot_text, demo_text
 from config.path_config import tts_audio_path
 
-logging.basicConfig()
+from better_profanity import profanity
+
 logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class ConversationEngine(EventActor):
@@ -18,6 +20,7 @@ class ConversationEngine(EventActor):
         """
         This is the main class that runs the STT and bot interaction.
         """
+
         self.STT_handler = SpeechtoTextHandler()
 
         self.ChatGPT_handler = IntegrateChatGPT()
@@ -52,17 +55,19 @@ class ConversationEngine(EventActor):
         :return:
         """
 
-        logging.debug("Listening")
+        logger.debug("Listening")
 
         self.STT_handler.initiate_recording()
 
-        logging.debug("Inferencing")
+        logger.debug("Inferencing")
 
-        self.inference_output = self.STT_handler.run_inference()
+        unfiltered_inference_output = self.STT_handler.run_inference()
 
-        logging.debug("Finished inferencing")
+        self.inference_output = profanity.censor(unfiltered_inference_output, '-')
 
-        logging.debug(f"Inference output: {self.inference_output}")
+        logger.debug("Finished inferencing")
+
+        logger.debug(f"Inference output: {self.inference_output}")
         logger.debug(self.inference_output)
 
         return True
@@ -109,7 +114,7 @@ class ConversationEngine(EventActor):
         :return:
         """
         if self.demo_mode:
-            logging.debug("Demo mode activated")
+            logger.debug("Demo mode activated")
             self.produce_event(TTSEvent(["GENERATE_TTS", demo_text], 1))
             return True
         else:
