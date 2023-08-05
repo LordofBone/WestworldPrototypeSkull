@@ -1,5 +1,6 @@
-from config.logging_config import log_level
 import logging
+
+from config.logging_config import log_level
 
 
 class LockedLogger(logging.Logger):
@@ -10,9 +11,10 @@ class LockedLogger(logging.Logger):
     def setLevel(self, level):
         if self._locked:
             print(
-                f"Logger level is locked at {logging.getLevelName(self.level)}. Ignoring attempt to set to {logging.getLevelName(level)}.")
+                f"Logger level is locked at {logging.getLevelName(self.level)}. "
+                f"Ignoring attempt to set to {logging.getLevelName(level)}.")
             return
-        print("locked")
+        print(f"Logger level set and locked to {logging.getLevelName(level)}.")
         super().setLevel(level)
         self._locked = True
 
