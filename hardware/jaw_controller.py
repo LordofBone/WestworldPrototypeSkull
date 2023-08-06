@@ -16,6 +16,8 @@ class JawController(Thread):
         self._open_pulse_width = open_pulse_width
         self._close_pulse_width = close_pulse_width
 
+        self.close_jaw()
+
     def run(self):
         # Continuous running behavior can be added here if needed
         pass
