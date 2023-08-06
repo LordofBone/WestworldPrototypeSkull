@@ -3,10 +3,9 @@ import time
 from threading import Thread
 
 import numpy as np
-import pyaudio
 
 from EventHive.event_hive_runner import EventActor
-from components.audio_system import AudioEngineAccess
+from components.audio_system import audio_engine_access
 from config.custom_events import MovementEvent, MicrowaveControllerEvent
 from hardware.jaw_controller import JawController
 
@@ -18,12 +17,10 @@ class AudioJawSync(EventActor):
     def __init__(self, event_queue):
         super().__init__(event_queue)
 
-        self.p = pyaudio.PyAudio()
-        self.input_device = int(self.find_usb_microphone_device())
-
         self.servo_controller = JawController()
 
-        self.path = AudioEngineAccess.path
+        self.path = audio_engine_access().path
+        audio_engine_access().set_microphone_name("USB PnP Sound Device")
 
         self.analyzing = False
 
@@ -34,66 +31,12 @@ class AudioJawSync(EventActor):
 
         self.seconds_to_analyze = 30
 
-        # Audio settings
-        self.sample_rates = [8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 384000]
-        self.chunk_sizes = [128, 256, 512, 1024, 2048]
-        self.RATE = self.find_compatible_sample_rate()  # Find lowest compatible sample rate
-        self.CHUNK = self.find_compatible_chunk_size()  # Reduced chunk size
         self.max_rms = 50  # Set the maximum RMS value to 50
         self.min_rms = 15  # Set the minimum RMS value to 15
 
         # Normalize RMS value to desired pulse width range (25 to 75)
         self.min_pulse_width = self.servo_controller.close_pulse_width
         self.max_pulse_width = self.servo_controller.open_pulse_width
-
-    def find_usb_microphone_device(self):
-        # List all audio devices
-        for i in range(self.p.get_device_count()):
-            info = self.p.get_device_info_by_index(i)
-            logger.debug(f"Device index: {info['index']} - {info['name']}")
-
-            # Check if the device name contains "USB PnP Sound Device"
-            if "USB PnP Sound Device" in info['name']:
-                logger.debug("Found USB PnP Sound Device at index:", info['index'])
-                return info['index']
-
-        # If the device was not found
-        logger.debug("USB PnP Sound Device not found")
-        raise Exception("USB PnP Sound Device not found, please ensure it is plugged in.")
-
-    def find_compatible_sample_rate(self):
-        # Check for supported sample rates
-        for rate in self.sample_rates:
-            try:
-                is_supported = self.p.is_format_supported(rate,
-                                                          input_device=self.input_device,
-                                                          input_channels=1,
-                                                          input_format=pyaudio.paInt16)
-                logger.debug(f"  Sample rate {rate} is supported: {is_supported}")
-                return rate
-            except ValueError as err:
-                logger.debug(f"  Sample rate {rate} is NOT supported: {err}")
-
-    # Check for supported chunk sizes
-    def find_compatible_chunk_size(self):
-        for chunk_size in self.chunk_sizes:
-            try:
-                # Attempt to open a stream with the given chunk size
-                # If this fails, it will throw an exception which is caught in the except block
-                stream = self.p.open(format=pyaudio.paInt16,
-                                     channels=1,
-                                     rate=self.RATE,  # Use the rate determined previously
-                                     input=True,
-                                     frames_per_buffer=chunk_size,
-                                     input_device_index=self.input_device)
-
-                # If we reach this line, the chunk size is supported. Close the stream and return the chunk size.
-                stream.close()
-                logger.debug(f"  Chunk size {chunk_size} is supported.")
-                return chunk_size
-            except Exception as err:
-                # This chunk size is not supported. Continue checking the next one.
-                logger.debug(f"  Chunk size {chunk_size} is NOT supported: {err}")
 
     def set_jaw_position(self, pulse_width, event_type=None, event_data=None):
         self.servo_controller.set_pulse_width(pulse_width)
@@ -109,19 +52,14 @@ class AudioJawSync(EventActor):
         self.rms = min(np.sqrt(np.mean(self.data ** 2)), self.max_rms)
 
     def analyze_audio(self):
-        stream = self.p.open(format=pyaudio.paInt16,
-                             channels=1,
-                             rate=self.RATE,
-                             input=True,
-                             frames_per_buffer=self.CHUNK,
-                             input_device_index=self.input_device)
+        audio_engine_access().init_recording_stream()
 
         try:
             while self.analyzing:
                 start_time = time.time()  # Record the start time
 
                 # Read data
-                self.data = np.frombuffer(stream.read(self.CHUNK, exception_on_overflow=False), dtype=np.int16)
+                self.data = np.frombuffer(audio_engine_access().read_recording_stream(), dtype=np.int16)
 
                 # Calculate RMS
                 self.calculate_rms_on_cpu()
@@ -149,12 +87,9 @@ class AudioJawSync(EventActor):
             # Always close the stream when we're done to prevent resource leaks
             logger.debug("Audio analysis done, closing jaw and audio stream")
             self.close_jaw()
-            stream.close()
+            audio_engine_access().close_recording_stream()
 
             return True
-
-        # logger.debug("Audio, closing jaw")
-        # self.close_jaw()
 
     def audio_to_jaw_movement(self, event_type=None, event_data=None):
         logger.debug("Audio to jaw movement")
@@ -177,8 +112,8 @@ class AudioJawSync(EventActor):
                 self.analyzing = True
 
                 # Set and play audio file from location
-                AudioEngineAccess.audio_file = event_data
-                AudioEngineAccess.play_audio()
+                audio_engine_access().audio_file = event_data
+                audio_engine_access().play_audio()
 
                 # Stop analyzing when audio is done playing
                 self.analyzing = False
