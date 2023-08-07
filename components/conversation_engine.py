@@ -6,6 +6,7 @@ from Lakul.integrate_stt import SpeechtoTextHandler
 from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectEvent, TTSDoneEvent
 from config.nix_tts import shutdown_text, reboot_text, demo_text
 from config.path_config import tts_audio_path
+from config.skull_config import microphone_name, role
 
 from better_profanity import profanity
 
@@ -21,9 +22,9 @@ class ConversationEngine(EventActor):
         This is the main class that runs the STT and bot interaction.
         """
 
-        self.STT_handler = SpeechtoTextHandler()
+        self.STT_handler = SpeechtoTextHandler(microphone_name)
 
-        self.ChatGPT_handler = IntegrateChatGPT()
+        self.ChatGPT_handler = IntegrateChatGPT(role=role, use_history=True)
 
         self.inference_output = None
 
@@ -94,8 +95,7 @@ class ConversationEngine(EventActor):
         This function returns the bot response.
         :return:
         """
-        self.ChatGPT_handler.set_text_input(self.inference_output)
-        self.bot_response = self.ChatGPT_handler.get_chatgpt_response()
+        self.bot_response = self.ChatGPT_handler.get_response(self.inference_output)
         logger.debug(f"Bot response: {self.bot_response}")
         return True
 
