@@ -170,6 +170,7 @@ class AudioEngine:
             logger.debug("Recording stream not initialized")
         else:
             self._recording_stream.close()
+            self._recording_stream = None
             logger.debug("Recording stream closed")
 
 
