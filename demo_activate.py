@@ -22,10 +22,10 @@ def main():
     event_queue = EventQueue()
     systems = [
         LedResourceMonitor(),
-        MicrowaveDetector(event_queue),
+        MicrowaveDetector(event_queue, demo_mode=True),
         TTSOperations(event_queue),
         AudioJawSync(event_queue),
-        ConversationEngine(event_queue, demo_mode=True),
+        ConversationEngine(event_queue),
     ]
 
     logging.debug("Starting producer and consumer threads")

@@ -15,7 +15,7 @@ logger.debug("Initialized")
 
 
 class ConversationEngine(EventActor):
-    def __init__(self, event_queue, demo_mode=False):
+    def __init__(self, event_queue):
         super().__init__(event_queue)
 
         """
@@ -29,8 +29,6 @@ class ConversationEngine(EventActor):
         self.inference_output = None
 
         self.bot_response = None
-
-        self.demo_mode = demo_mode
 
     def speak_tts(self, text, event_type=None, event_data=None):
         """
@@ -113,15 +111,19 @@ class ConversationEngine(EventActor):
         This function runs the conversation cycle.
         :return:
         """
-        if self.demo_mode:
-            logger.debug("Demo mode activated")
-            self.produce_event(TTSEvent(["GENERATE_TTS", demo_text], 1))
-            return True
-        else:
-            self.listen_stt()
-            self.command_checker()
-            self.get_bot_engine_response()
-            self.speak_tts_bot_response()
+        self.listen_stt()
+        self.command_checker()
+        self.get_bot_engine_response()
+        self.speak_tts_bot_response()
+
+    def conversation_cycle_demo(self, event_type=None, event_data=None):
+        """
+        This function runs the conversation cycle.
+        :return:
+        """
+        logger.debug("Demo mode activated")
+        self.produce_event(TTSEvent(["GENERATE_TTS", demo_text], 1))
+        return True
 
     def get_event_handlers(self):
         """
@@ -129,6 +131,7 @@ class ConversationEngine(EventActor):
         :return:
         """
         return {
+            "HUMAN_DETECTED_DEMO": self.conversation_cycle_demo,
             "HUMAN_DETECTED": self.conversation_cycle,
             "TTS_GENERATION_FINISHED": self.activate_jaw_audio
         }

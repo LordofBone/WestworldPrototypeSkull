@@ -13,9 +13,10 @@ logger.debug("Initialized")
 
 
 class MicrowaveDetector(EventActor):
-    def __init__(self, event_queue, demo_mode=True):
+    def __init__(self, event_queue, demo_mode=False):
         super().__init__(event_queue)
-        self.scan_mode_enabled = demo_mode
+        self.demo_mode = demo_mode
+        self.scan_mode_enabled = True
 
         # Spawn a new thread to run the microwave scan function
         self.scan_thread = threading.Thread(target=self.microwave_scan, daemon=True)
@@ -25,8 +26,12 @@ class MicrowaveDetector(EventActor):
         while True:
             if InventorHATCoreInit.board.gpio_pin_value(0):
                 if self.scan_mode_enabled:
-                    self.produce_event(DetectEvent(["HUMAN_DETECTED"], 1))
-                    logger.debug("Movement detected")
+                    if self.demo_mode:
+                        self.produce_event(DetectEvent(["HUMAN_DETECTED_DEMO"], 1))
+                        logger.debug("Movement detected - Demo mode")
+                    else:
+                        self.produce_event(DetectEvent(["HUMAN_DETECTED"], 1))
+                        logger.debug("Movement detected")
                     self.scan_mode_off()
                     sleep(2)
 
