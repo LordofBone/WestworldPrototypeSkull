@@ -20,7 +20,7 @@ class AudioJawSync(EventActor):
         self.servo_controller = JawController()
 
         self.path = audio_engine_access().path
-        audio_engine_access().set_microphone_name("USB PnP Sound Device")
+        audio_engine_access().set_microphone_name("Loopback: PCM (hw:2,1)")
 
         self.analyzing = False
 
@@ -83,6 +83,8 @@ class AudioJawSync(EventActor):
                 end_time = time.time()  # Record the end time
                 processing_time = end_time - start_time
                 logger.debug(f"Processing time: {processing_time:.6f} seconds")
+        except Exception as e:
+            logger.exception("Exception occurred during audio analysis: " + str(e))
         finally:
             # Always close the stream when we're done to prevent resource leaks
             logger.debug("Audio analysis done, closing jaw and audio stream")
