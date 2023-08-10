@@ -11,6 +11,7 @@ from EventHive.event_hive_runner import EventActor
 from config.custom_events import TTSEvent, TTSDoneEvent
 from config.fakeyou_config import username, password, voice_model
 from config.nix_tts import nix_dir, audio_dir, file_name, stoch_model_path
+from config.pyttsx3_config import pyttsx3_voice
 from config.skull_config import tts_mode
 
 sys.path.append(nix_dir)
@@ -56,7 +57,7 @@ class TTSOperationsPyTTSx3(AbstractTTSOperations):
         self.engine = pyttsx3.init()
         self.voices = self.engine.getProperty('voices')
         logger.debug(f"Voices: {self.voices}")
-        self.engine.setProperty('voice', self.voices[2].id)
+        self.engine.setProperty('voice', self.voices[pyttsx3_voice].id)
         self.filename = f'{audio_dir}/{file_name}'
 
     def generate_tts(self, text_input):
