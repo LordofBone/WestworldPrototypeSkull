@@ -6,7 +6,6 @@ import pyaudio
 from playsound import playsound
 
 from config.nix_tts import audio_on, file_name
-from config.skull_config import microphone_name
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -54,9 +53,10 @@ class AudioEngine:
             return
         self.__initialized = True
 
-        self.microphone_name = microphone_name
-
         self.p = pyaudio.PyAudio()
+
+        self.microphones = {}
+        self.recording_streams = {}
 
         self.sample_rates = [8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 384000]
         self.chunk_sizes = [128, 256, 512, 1024, 2048]
@@ -76,14 +76,22 @@ class AudioEngine:
         self.online = self.path / "online.wav"
         self.training = self.path / "training.wav"
 
-    def set_microphone_name(self, mic_name="Microphone"):
-        self.microphone_name = mic_name
-        self.input_device = int(self.find_usb_microphone_device())
+    def set_microphone_name(self, mic_key, mic_name):
+        self.microphones[mic_key] = mic_name
+        input_device = int(self.find_input_device(mic_name))
 
-        self.RATE = self.find_compatible_sample_rate()
-        self.CHUNK = self.find_compatible_chunk_size()
+        self.RATE = self.find_compatible_sample_rate(input_device)
+        self.CHUNK = self.find_compatible_chunk_size(input_device)
 
-    def find_usb_microphone_device(self):
+        # Store the RATE and CHUNK values in a dictionary for each microphone
+        self.microphones[mic_key] = {
+            'name': mic_name,
+            'device': input_device,
+            'RATE': self.RATE,
+            'CHUNK': self.CHUNK
+        }
+
+    def find_input_device(self, mic_name):
         # List all audio devices
         for i in range(self.p.get_device_count()):
             info = self.p.get_device_info_by_index(i)
@@ -91,20 +99,20 @@ class AudioEngine:
             logger.debug(f"Device index: {info['index']} - {info['name']}")
 
             # Check if the device name contains "USB PnP Sound Device"
-            if self.microphone_name in info['name']:
-                logger.debug(f"{self.microphone_name} at index: {info['index']}")
+            if mic_name in info['name']:
+                logger.debug(f"{mic_name} at index: {info['index']}")
                 return info['index']
 
         # If the device was not found
-        logger.debug(f"{self.microphone_name} not found")
-        raise Exception(f"{self.microphone_name} not found, please ensure it is plugged in.")
+        logger.debug(f"{mic_name} not found")
+        raise Exception(f"{mic_name} not found, please ensure it is plugged in.")
 
-    def find_compatible_sample_rate(self):
+    def find_compatible_sample_rate(self, input_device):
         # Check for supported sample rates
         for rate in self.sample_rates:
             try:
                 is_supported = self.p.is_format_supported(rate,
-                                                          input_device=self.input_device,
+                                                          input_device=input_device,
                                                           input_channels=1,
                                                           input_format=pyaudio.paInt16)
                 logger.debug(f"  Sample rate {rate} is supported: {is_supported}")
@@ -113,7 +121,7 @@ class AudioEngine:
                 logger.debug(f"  Sample rate {rate} is NOT supported: {err}")
 
     # Check for supported chunk sizes
-    def find_compatible_chunk_size(self):
+    def find_compatible_chunk_size(self, input_device):
         for chunk_size in self.chunk_sizes:
             try:
                 # Attempt to open a stream with the given chunk size
@@ -123,7 +131,7 @@ class AudioEngine:
                                      rate=self.RATE,  # Use the rate determined previously
                                      input=True,
                                      frames_per_buffer=chunk_size,
-                                     input_device_index=self.input_device)
+                                     input_device_index=input_device)
 
                 # If we reach this line, the chunk size is supported. Close the stream and return the chunk size.
                 stream.close()
@@ -141,37 +149,45 @@ class AudioEngine:
         if self.audio_on:
             playsound(self.audio_file)
 
-    def init_recording_stream(self):
-        if self._recording_stream is not None:
-            logger.debug("Recording stream already initialized")
+    def init_recording_stream(self, mic_key):
+        mic_info = self.microphones.get(mic_key)
+        print(mic_info)
+        if not mic_info:
+            logger.error(f"Microphone {mic_key} not initialized")
             return
-        else:
-            logger.debug("Initializing recording stream")
-            self._recording_stream = self.p.open(format=pyaudio.paInt16,
-                                                 channels=1,
-                                                 rate=self.RATE,
-                                                 input=True,
-                                                 frames_per_buffer=self.CHUNK,
-                                                 input_device_index=self.input_device)
 
-    def read_recording_stream(self):
-        """
-        This function is used to read the audio input from the microphone.
-        """
-        if self._recording_stream is None:
-            logger.debug("Recording stream not initialized")
+        if mic_key in self.recording_streams:
+            logger.debug(f"Recording stream for {mic_key} already initialized")
             return
-        else:
-            data = self._recording_stream.read(self.CHUNK, exception_on_overflow=False)
-            return data
 
-    def close_recording_stream(self):
-        if self._recording_stream is None:
-            logger.debug("Recording stream not initialized")
-        else:
-            self._recording_stream.close()
-            self._recording_stream = None
-            logger.debug("Recording stream closed")
+        self.recording_streams[mic_key] = self.p.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=mic_info['RATE'],
+            input=True,
+            frames_per_buffer=mic_info['CHUNK'],
+            input_device_index=mic_info['device']
+        )
+
+    def read_recording_stream(self, mic_key):
+        stream = self.recording_streams.get(mic_key)
+        if not stream:
+            logger.error(f"Recording stream for {mic_key} not initialized")
+            return
+
+        mic_info = self.microphones.get(mic_key)
+        data = stream.read(mic_info['CHUNK'], exception_on_overflow=False)
+        return data
+
+    def close_recording_stream(self, mic_key):
+        stream = self.recording_streams.get(mic_key)
+        if not stream:
+            logger.error(f"Recording stream for {mic_key} not initialized")
+            return
+
+        stream.close()
+        del self.recording_streams[mic_key]
+        logger.debug(f"Recording stream for {mic_key} closed")
 
 
 def audio_engine_access():
