@@ -6,6 +6,7 @@ import numpy as np
 
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import audio_engine_access
+from config.audio_config import loopback_name, usb_microphone_name
 from config.custom_events import MovementEvent, MicrowaveControllerEvent
 from hardware.jaw_controller import JawController
 
@@ -20,7 +21,9 @@ class AudioJawSync(EventActor):
         self.servo_controller = JawController()
 
         self.path = audio_engine_access().path
-        audio_engine_access().set_microphone_name("Loopback: PCM (hw:2,1)")
+
+        audio_engine_access().set_microphone_name(mic_key="USB Microphone", mic_name=usb_microphone_name)
+        audio_engine_access().set_microphone_name(mic_key="Loopback", mic_name=loopback_name)
 
         self.analyzing = False
 
@@ -52,14 +55,15 @@ class AudioJawSync(EventActor):
         self.rms = min(np.sqrt(np.mean(self.data ** 2)), self.max_rms)
 
     def analyze_audio(self):
-        audio_engine_access().init_recording_stream()
+        audio_engine_access().init_recording_stream(mic_key="Loopback")
 
         try:
             while self.analyzing:
                 start_time = time.time()  # Record the start time
 
                 # Read data
-                self.data = np.frombuffer(audio_engine_access().read_recording_stream(), dtype=np.int16)
+                self.data = np.frombuffer(audio_engine_access().read_recording_stream(mic_key="Loopback"),
+                                          dtype=np.int16)
 
                 # Calculate RMS
                 self.calculate_rms_on_cpu()
@@ -89,7 +93,7 @@ class AudioJawSync(EventActor):
             # Always close the stream when we're done to prevent resource leaks
             logger.debug("Audio analysis done, closing jaw and audio stream")
             self.close_jaw()
-            audio_engine_access().close_recording_stream()
+            audio_engine_access().close_recording_stream(mic_key="Loopback")
 
             return True
 
