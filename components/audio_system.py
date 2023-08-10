@@ -5,7 +5,7 @@ from threading import Condition
 import pyaudio
 from playsound import playsound
 
-from config.nix_tts import audio_on, file_name
+from config.tts_config import audio_on, file_name
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")

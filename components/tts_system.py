@@ -10,9 +10,7 @@ from fakeyou.fakeyou import FakeYou
 from EventHive.event_hive_runner import EventActor
 from config.custom_events import TTSEvent, TTSDoneEvent
 from config.fakeyou_config import username, password, voice_model
-from config.nix_tts import nix_dir, audio_dir, file_name, stoch_model_path
-from config.pyttsx3_config import pyttsx3_voice
-from config.skull_config import tts_mode
+from config.tts_config import tts_mode, nix_dir, audio_dir, file_name, stoch_model_path, pyttsx3_voice
 
 sys.path.append(nix_dir)
 

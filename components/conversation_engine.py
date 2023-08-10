@@ -5,11 +5,11 @@ from better_profanity import profanity
 from ChattingGPT.integrate_chatgpt import IntegrateChatGPT
 from EventHive.event_hive_runner import EventActor
 from Lakul.integrate_stt import SpeechtoTextHandler
-from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectEvent, TTSDoneEvent
-from config.nix_tts import shutdown_text, reboot_text, demo_text
-from config.path_config import tts_audio_path
 from config.audio_config import usb_microphone_name
-from config.skull_config import role
+from config.chattinggpt_config import role
+from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectEvent, TTSDoneEvent
+from config.path_config import tts_audio_path
+from config.tts_config import shutdown_text, reboot_text, demo_text
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
