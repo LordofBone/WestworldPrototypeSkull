@@ -1,6 +1,6 @@
 import logging
 
-from config.logging_config import log_level
+from config.logging_config import log_level, log_format
 
 
 class LockedLogger(logging.Logger):
@@ -17,6 +17,20 @@ class LockedLogger(logging.Logger):
         print(f"Logger level set and locked to {logging.getLevelName(level)}.")
         super().setLevel(level)
         self._locked = True
+
+
+class LockedStreamHandler(logging.StreamHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._formatter_locked = False
+
+    def setFormatter(self, fmt):
+        if self._formatter_locked:
+            print("Formatter is locked. Ignoring attempt to change it.")
+            return
+        print("Formatter set and locked.")
+        super().setFormatter(fmt)
+        self._formatter_locked = True
 
 
 def get_locked_root_logger():
@@ -37,9 +51,9 @@ if not isinstance(numeric_level, int):
 
 logger.setLevel(numeric_level)
 
-console_handler = logging.StreamHandler()
+console_handler = LockedStreamHandler()
 console_handler.setLevel(numeric_level)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(log_format)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
