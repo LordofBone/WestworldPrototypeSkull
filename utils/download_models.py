@@ -1,6 +1,6 @@
 import gdown
 
-from config.nix_tts import *
+from config.tts_config import determ_model_path, stoch_model_path
 
 
 def download_models():
