@@ -54,15 +54,15 @@ class AudioJawSync(EventActor):
         # Calculate RMS and clip to max RMS
         self.rms = min(np.sqrt(np.mean(self.data ** 2)), self.max_rms)
 
-    def analyze_audio(self):
-        audio_engine_access().init_recording_stream(mic_key="Loopback")
+    def analyze_audio(self, device="Microphone"):
+        audio_engine_access().init_recording_stream(mic_key=device)
 
         try:
             while self.analyzing:
                 start_time = time.time()  # Record the start time
 
                 # Read data
-                self.data = np.frombuffer(audio_engine_access().read_recording_stream(mic_key="Loopback"),
+                self.data = np.frombuffer(audio_engine_access().read_recording_stream(mic_key=device),
                                           dtype=np.int16)
 
                 # Calculate RMS
@@ -93,44 +93,36 @@ class AudioJawSync(EventActor):
             # Always close the stream when we're done to prevent resource leaks
             logger.debug("Audio analysis done, closing jaw and audio stream")
             self.close_jaw()
-            audio_engine_access().close_recording_stream(mic_key="Loopback")
+            audio_engine_access().close_recording_stream(mic_key=device)
 
             return True
 
     def audio_to_jaw_movement(self, event_type=None, event_data=None):
         logger.debug("Audio to jaw movement")
-        # Start audio analysis in a separate thread
-        audio_analysis_thread = Thread(target=self.analyze_audio)
-        audio_analysis_thread.daemon = False  # Daemon thread will exit when the main program exits
-        audio_analysis_thread.start()
 
         try:
-
             if event_data is None:
-                self.analyzing = True
+                # Start audio analysis in a separate thread
+                audio_analysis_thread = Thread(target=self.analyze_audio, args=("USB Microphone",), daemon=True)
+                audio_analysis_thread.start()
 
+                self.analyzing = True
                 # Wait for the specified number of seconds
                 time.sleep(self.seconds_to_analyze)
-
-                # Stop analyzing when time has elapsed
                 self.analyzing = False
             else:
-                self.analyzing = True
+                # Start audio analysis in a separate thread
+                audio_analysis_thread = Thread(target=self.analyze_audio, args=("Loopback",), daemon=True)
+                audio_analysis_thread.start()
 
+                self.analyzing = True
                 # Set and play audio file from location
                 audio_engine_access().audio_file = event_data
                 audio_engine_access().play_audio()
-
-                # Stop analyzing when audio is done playing
                 self.analyzing = False
-
         finally:
-
-            # Stop analyzing when audio is done playing
             self.analyzing = False
-
             self.produce_event(MicrowaveControllerEvent(["SCAN_MODE_ON"], 1))
-
             return True
 
     def get_event_handlers(self):
