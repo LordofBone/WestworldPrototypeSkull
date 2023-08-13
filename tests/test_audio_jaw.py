@@ -1,6 +1,6 @@
-import logging
 import sys
 from pathlib import Path
+from time import sleep
 
 top_dir = Path(__file__).parent.parent
 
@@ -11,31 +11,59 @@ from EventHive.event_hive_runner import EventQueue
 from components.jaw_system import AudioJawSync
 from config.custom_events import MovementEvent
 from config.tts_config import tts_audio_path
+import unittest
+import logging
+import threading
 
-# Configure logging level
-logging.basicConfig(level=logging.DEBUG)
 
+class EnhancedAudioJawSyncTest(unittest.TestCase):
 
-class AudioJawSyncTest:
-    def __init__(self):
-        # Create an instance of the class and start it
+    def setUp(self):
+        """Setup method to initialize necessary components before each test."""
         self.event_queue = EventQueue()
-        jaw_system_test = AudioJawSync(self.event_queue)
-        jaw_system_test.start()
+        self.audio_jaw_sync = AudioJawSync(self.event_queue)
+        self.audio_jaw_sync.start()
+
+    def tearDown(self):
+        """Teardown method to free resources after each test."""
+        self.audio_jaw_sync.analyzing = False
+
+        # If there's any active threads, join them (stop them)
+        for thread in threading.enumerate():
+            if thread.is_alive():
+                try:
+                    thread.join(1)  # Give the thread 1 second to finish
+                except Exception as e:
+                    logging.error(f"Error stopping thread: {e}")
+
+        # If there's any other cleanup specific to your application, add them here
+
+        # Ensure proper shutdown of the EventActor thread
+        self.audio_jaw_sync.shutdown()
+
+
+class TestExistingMethods(EnhancedAudioJawSyncTest):
 
     def test_audiofile_to_jaw(self):
         logging.debug("Testing audiofile to jaw")
         event = MovementEvent(["JAW_TTS_AUDIO", tts_audio_path], 1)
         self.event_queue.queue_addition(event)
+        sleep(5)  # Give some time for the audio to play and be analyzed
+        while self.audio_jaw_sync.analyzing:
+            pass
+        logging.debug("Done testing audiofile to jaw")
 
-    def test_mic_to_jaw(self, seconds_to_analyze=30):
+    def test_mic_to_jaw(self):
         logging.debug("Testing mic to jaw")
         event = MovementEvent(["JAW_TTS_AUDIO"], 1)
         self.event_queue.queue_addition(event)
+        sleep(5)  # Give some time for the mic audio to be analyzed
+        while self.audio_jaw_sync.analyzing:
+            pass
+        logging.debug("Done testing mic to jaw")
 
 
-audio_jaw_sync_test = AudioJawSyncTest()
-audio_jaw_sync_test.seconds_to_analyze = 120
-
-audio_jaw_sync_test.test_audiofile_to_jaw()
-audio_jaw_sync_test.test_mic_to_jaw()
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
+    print("Active threads:", threading.enumerate())
+    sys.exit(0)  # Exit the script
