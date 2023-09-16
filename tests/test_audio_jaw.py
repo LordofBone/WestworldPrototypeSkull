@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from time import sleep
 
 top_dir = Path(__file__).parent.parent
 
@@ -14,6 +13,7 @@ from config.tts_config import tts_audio_path
 import unittest
 import logging
 import threading
+from time import sleep
 
 
 class EnhancedAudioJawSyncTest(unittest.TestCase):
