@@ -6,7 +6,7 @@ import numpy as np
 
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import audio_engine_access
-from config.audio_config import loopback_name, usb_microphone_name
+from config.audio_config import loopback_name, microphone_name
 from config.custom_events import MovementEvent, MicrowaveControllerEvent
 from hardware.jaw_controller import JawController
 
@@ -22,7 +22,7 @@ class AudioJawSync(EventActor):
 
         self.path = audio_engine_access().path
 
-        audio_engine_access().set_microphone_name(mic_key="USB Microphone", mic_name=usb_microphone_name)
+        audio_engine_access().set_microphone_name(mic_key="USB Microphone", mic_name=microphone_name)
         audio_engine_access().set_microphone_name(mic_key="Loopback", mic_name=loopback_name)
 
         self.analyzing = False

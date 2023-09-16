@@ -1,2 +1,3 @@
-usb_microphone_name = "USB PnP Sound Device"
+# if on a PC or other generic device set "Microphone", for USB on RPi set "USB PnP Sound Device"
+microphone_name = "USB PnP Sound Device"
 loopback_name = "Loopback: PCM (hw:0,0)"

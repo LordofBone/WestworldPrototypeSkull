@@ -5,7 +5,7 @@ from better_profanity import profanity
 from ChattingGPT.integrate_chatgpt import IntegrateChatGPT
 from EventHive.event_hive_runner import EventActor
 from Lakul.integrate_stt import SpeechtoTextHandler
-from config.audio_config import usb_microphone_name
+from config.audio_config import microphone_name
 from config.chattinggpt_config import role
 from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectEvent, TTSDoneEvent
 from config.path_config import tts_audio_path
@@ -23,7 +23,7 @@ class ConversationEngine(EventActor):
         This is the main class that runs the STT and bot interaction.
         """
 
-        self.STT_handler = SpeechtoTextHandler(usb_microphone_name)
+        self.STT_handler = SpeechtoTextHandler(microphone_name)
 
         self.ChatGPT_handler = IntegrateChatGPT(role=role, use_history=True)
 
