@@ -7,9 +7,9 @@ This guide will walk you through the process of setting up a virtual loopback de
 - Raspberry Pi with Raspbian or a similar OS installed.
 - ALSA utilities installed (usually pre-installed with Raspbian).
 
-## Hardware setup
+## Hardware/Code setup
 
-Full instructions/parts list can be found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9)
+Full build instructions/parts list can be found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9)
 
 ## Audio setup
 
