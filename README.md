@@ -11,6 +11,34 @@ This guide will walk you through the process of setting up a virtual loopback de
 
 Full build instructions/parts list can be found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9)
 
+Software runs on RPi OS Bullseye (64-bit)
+
+## Installing dependencies
+
+You can install the dependencies in a virtual environment:
+
+```sudo apt-get install virtualenv```
+
+```virtualenv venv```
+
+```source venv/bin/activate```
+
+```sudo pip install -r requirements.txt```
+
+(Needs to be run as sudo as the Inventor HAT Mini library requires it below) 
+
+### Installing the Inventor Hat Mini library
+
+```https://github.com/pimoroni/inventorhatmini-python#getting-the-library```
+
+More info [here](https://github.com/pimoroni/inventorhatmini-python)
+
+Also ensure I2C is enabled on the Raspberry Pi:
+
+```sudo raspi-config```
+
+Select 'Interfacing Options' and then 'I2C' and enable it.
+
 ## Audio setup
 
 ### 1. Load the Loopback Module
@@ -26,7 +54,6 @@ And add the end of the file:
 And the reboot the Raspberry Pi:
 
 ```sudo reboot now```
-
 
 ### 2. Configure ALSA
 
@@ -79,12 +106,15 @@ pcm.loopout {
 }
 ```
 
+Or can copy and paste the asound.conf file in this repo:
+    
+```sudo cp setup/asound.conf /etc/```
+
 ### 3. Move the Configuration File
 
 If you've created or modified the `asound.conf` file in a different location, move it to `/etc/`:
 
 ```sudo mv asound.conf /etc/```
-
 
 ### 4. Restart ALSA Utilities
 
