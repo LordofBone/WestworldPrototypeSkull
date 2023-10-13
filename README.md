@@ -33,11 +33,27 @@ You can install the dependencies in a virtual environment:
 
 More info [here](https://github.com/pimoroni/inventorhatmini-python)
 
+Be sure to follow the audio setup instructions below as well.
+
+It's also worth disabling HDMI audio out to prevent the audio from playing through the HDMI port:
+
+```sudo nano /boot/config.txt```
+
+Change line "dtoverlay=vc4-kms-v3d" to "dtoverlay=vc4-kms-v3d,noaudio" and reboot.
+
+And finally install:
+
+```sudo apt install python3-gst-1.0```
+
 Also ensure I2C is enabled on the Raspberry Pi:
 
 ```sudo raspi-config```
 
 Select 'Interfacing Options' and then 'I2C' and enable it.
+
+### Installing e-speak (for TTS)
+
+```sudo apt-get install espeak```
 
 ## Audio setup
 
@@ -121,6 +137,26 @@ If you've created or modified the `asound.conf` file in a different location, mo
 To load the new configuration, restart the ALSA utilities:
 
 ```/etc/init.d/alsa-utils restart```
+
+### 5. Disable HDMI audio out
+
+To disable HDMI audio out, edit the `/boot/config.txt` file:
+
+```sudo nano /boot/config.txt```
+
+And change the following line:
+
+```dtparam=audio=on```
+
+to:
+
+```dtparam=audio=off```
+
+### 6. Reboot
+
+Reboot the Raspberry Pi:
+
+```sudo reboot now```
 
 ### Troubleshooting
 
