@@ -51,6 +51,14 @@ Also ensure I2C is enabled on the Raspberry Pi:
 
 Select 'Interfacing Options' and then 'I2C' and enable it.
 
+It's also a good idea to use alsamixer to adjust the volume of the microphone:
+
+```alsamixer```
+
+Hit F4 to go to the capture screen.
+
+Find the USB PnP Sound Device and adjust to volume to around 30% and then hit ESC to exit.
+
 ### Installing e-speak (for TTS)
 
 ```sudo apt-get install espeak```
