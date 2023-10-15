@@ -1,50 +1,76 @@
 import sys
+import unittest
+
 from pathlib import Path
+import threading
+import queue
 
 top_dir = Path(__file__).parent.parent
 
 sys.path.append(str(top_dir))
 
-from time import sleep
-from config.audio_config import microphone_name
+from components.audio_system import audio_engine_access
+
+from config.audio_config import loopback_name
+from config.tts_config import whisper_test_audio_path
 from Lakul.integrate_stt import SpeechtoTextHandler
 
 
-def test_real_hardware_stt():
-    # Initialize STT handler
-    SpeechtoText = SpeechtoTextHandler(microphone_name)
-    SpeechtoText.model_size = "tiny"
+class TestWhisperSTT(unittest.TestCase):
+    def setUp(self):
+        self.path = audio_engine_access().path
+        audio_engine_access().audio_file = whisper_test_audio_path
+        self.transcription_queue = queue.Queue()
 
-    # Prompt the user
-    expected_phrase = "Testing Whisper speech to text"
-    print(f"Please say the following phrase clearly, after the countdown: '{expected_phrase}'")
+    def play_audio(self):
+        # Set and play audio file from location
+        audio_engine_access().play_audio()
+        print("Done playing audio")
 
-    # Countdown
-    for i in range(5, 0, -1):
-        print(i)
-        sleep(1)
-    print("SPEAK!")
+    def record_and_transcribe(self):
+        # Record and transcribe
+        print("Recording...")
+        self.SpeechtoText.initiate_recording(max_seconds=20, silence_duration=20000)
+        print("Inferencing...")
+        transcription = self.SpeechtoText.run_inference()
+        self.transcription_queue.put(transcription)
 
-    # Record and transcribe
-    SpeechtoText.initiate_recording()
-    print("Inferencing...")
-    transcription = SpeechtoText.run_inference()
+    def test_real_hardware_stt(self):
+        # Initialize STT handler
+        self.SpeechtoText = SpeechtoTextHandler(microphone_name=loopback_name)
+        self.SpeechtoText.model_size = "tiny"
 
-    # Display transcription
-    print(f"Transcription: {transcription}")
+        # Create threads
+        audio_thread = threading.Thread(target=self.play_audio)
 
-    # Assertions
-    if not transcription:
-        print("Test failed: The transcription result is empty.")
-        return
-    if "Testing" not in transcription and "Whisper" not in transcription:
-        print("Test failed: The transcription does not match the expected phrase.")
-        return
+        transcription_thread = threading.Thread(target=self.record_and_transcribe)
 
-    print("Test completed. Please verify the transcription for accuracy.")
-    print("All tests passed.")
+        # Start threads
+        audio_thread.start()
+        transcription_thread.start()
+
+        # Wait for threads to finish
+        audio_thread.join()
+        transcription_thread.join()
+
+        # Retrieve the transcription from the queue
+        transcription = self.transcription_queue.get()
+
+        # Display transcription
+        print(f"Transcription: {transcription}")
+
+        # Assertions
+        if not transcription:
+            print("Test failed: The transcription result is empty.")
+            return
+        if "Testing" not in transcription and "Whisper" not in transcription:
+            print("Test failed: The transcription does not match the expected phrase.")
+            return
+
+        print("Test completed. Please verify the transcription for accuracy.")
+        print("All tests passed.")
 
 
 if __name__ == "__main__":
-    # Run the real hardware test
-    test_real_hardware_stt()
+    # Run the test
+    unittest.main(verbosity=2)
