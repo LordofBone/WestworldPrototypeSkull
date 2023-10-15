@@ -9,7 +9,7 @@ import utils.logging_system
 from EventHive.event_hive_runner import EventQueue
 from components.jaw_system import AudioJawSync
 from config.custom_events import MovementEvent
-from config.tts_config import test_audio_path
+from config.tts_config import jaw_test_audio_path
 import unittest
 import logging
 import threading
@@ -46,7 +46,7 @@ class TestExistingMethods(EnhancedAudioJawSyncTest):
 
     def test_audiofile_to_jaw(self):
         logging.debug("Testing audiofile to jaw")
-        event = MovementEvent(["JAW_TTS_AUDIO", test_audio_path], 1)
+        event = MovementEvent(["JAW_TTS_AUDIO", jaw_test_audio_path], 1)
         self.event_queue.queue_addition(event)
         sleep(5)  # Give some time for the audio to play and be analyzed
         while self.audio_jaw_sync.analyzing:
