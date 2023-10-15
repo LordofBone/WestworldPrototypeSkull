@@ -1,7 +1,8 @@
 .idea/
 misc/*
 audio/*
-!audio/test.wav
+!audio/jaw_test.wav
+!audio/whisper_test.wav
 __pycache__
 models/deterministic/*
 !models/deterministic/.gitkeep
