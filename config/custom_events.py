@@ -57,9 +57,9 @@ class HardwareEvent(Event):
         return self.__class__
 
 
-class MicrowaveControllerEvent(Event):
+class AudioDetectControllerEvent(Event):
     def __init__(self, content, priority):
-        super().__init__("Microwave_Controller_Event", content, priority)
+        super().__init__("Audio_Detect_Controller_Event", content, priority)
 
     def get_event_type(self):
         return self.__class__

@@ -7,7 +7,7 @@ from time import sleep
 from EventHive.event_hive_runner import EventQueue
 from components.conversation_engine import ConversationEngine
 from components.jaw_system import AudioJawSync
-from components.microwave_sensor_runner import MicrowaveDetector
+from components.audio_detector_runner import AudioDetector
 from components.resource_monitor_leds import LedResourceMonitor
 from components.tts_system import TTSOperations
 
@@ -22,7 +22,7 @@ def main():
     event_queue = EventQueue()
     systems = [
         LedResourceMonitor(),
-        MicrowaveDetector(event_queue, demo_mode=True),
+        AudioDetector(event_queue, demo_mode=True),
         TTSOperations(event_queue),
         AudioJawSync(event_queue),
         ConversationEngine(event_queue),
