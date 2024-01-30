@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-# pyttsx3/fakeyou/nix
+# Options are: pyttsx3/fakeyou/nix
 tts_mode = "nix"
 
 pyttsx3_voice = 2
