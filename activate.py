@@ -3,9 +3,8 @@ import logging
 from time import sleep
 
 from config.path_config import setup_paths
-
 from utils.logging_system import activate_logging_system
-
+activate_logging_system()
 setup_paths()
 from EventHive.event_hive_runner import EventQueue
 from components.conversation_engine import ConversationEngine
@@ -16,7 +15,6 @@ from components.tts_system import TTSOperations
 
 BOOT_SPLIT_WAIT = 5
 
-activate_logging_system()
 logger = logging.getLogger(__name__)
 
 

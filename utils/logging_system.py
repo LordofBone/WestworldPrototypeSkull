@@ -42,8 +42,6 @@ def get_locked_root_logger():
 
 
 def activate_logging_system():
-    # todo: find out why this works slightly differently when called as a function vs part of module import; some things
-    # get missed in debug logging in some modules when called this way
     # Use the custom function to get the root logger
     logger = get_locked_root_logger()
 

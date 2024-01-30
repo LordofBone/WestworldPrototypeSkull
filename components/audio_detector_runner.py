@@ -1,10 +1,12 @@
 import logging
 import threading
+
 import numpy as np
+
 from EventHive.event_hive_runner import EventActor
+from components.audio_system import audio_engine_access
 from config.audio_config import audio_input_detection_threshold
 from config.custom_events import DetectEvent, AudioDetectControllerEvent, TTSDoneEvent
-from components.audio_system import audio_engine_access
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -28,7 +30,8 @@ class AudioDetector(EventActor):
                 # Check if amplitude exceeds a threshold
                 if np.max(audio_amplitude) > audio_input_detection_threshold:
                     self.produce_event(DetectEvent(["HUMAN_DETECTED"], 1))
-                    logger.debug(f"Sound detected with amplitude {np.max(audio_amplitude)} exceeding threshold {audio_input_detection_threshold}")
+                    logger.debug(
+                        f"Sound detected with amplitude {np.max(audio_amplitude)} exceeding threshold {audio_input_detection_threshold}")
                     self.scan_mode_off()
 
     def scan_mode_on(self, event_type=None, event_data=None):

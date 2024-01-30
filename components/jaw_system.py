@@ -7,7 +7,7 @@ import numpy as np
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import audio_engine_access
 from config.audio_config import loopback_name, microphone_name
-from config.custom_events import MovementEvent, AudioDetectControllerEvent, TTSDoneEvent
+from config.custom_events import MovementEvent, TTSDoneEvent
 from hardware.jaw_controller import JawController
 
 logger = logging.getLogger(__name__)

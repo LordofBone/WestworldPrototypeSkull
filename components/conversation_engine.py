@@ -11,6 +11,7 @@ from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectE
     AudioDetectControllerEvent
 from config.path_config import tts_audio_path
 from config.tts_config import shutdown_text, reboot_text, demo_text
+
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
 
@@ -187,7 +188,8 @@ class ConversationEngine(EventActor):
         if self.functions_list:  # This checks if the list is not empty
             if self.current_index < len(self.functions_list):
                 func_name = self.functions_list[self.current_index]
-                logger.debug(f"Running next action: {func_name}, current index: {self.current_index}, total length: {len(self.functions_list)}")
+                logger.debug(
+                    f"Running next action: {func_name}, current index: {self.current_index}, total length: {len(self.functions_list)}")
                 self.current_index += 1
                 func = getattr(self, func_name)
                 func()
