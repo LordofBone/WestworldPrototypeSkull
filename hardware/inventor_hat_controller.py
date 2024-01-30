@@ -1,5 +1,10 @@
+import logging
+
 from inventorhatmini import InventorHATMini, SERVO_1, NUM_LEDS
 from ioexpander import IN  # or IN_PU of a pull-up is wanted
+
+logger = logging.getLogger(__name__)
+logger.debug("Initialized")
 
 
 class InventorHATCore:
