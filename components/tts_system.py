@@ -83,7 +83,7 @@ class TTSOperations(EventActor):
     def generate_tts(self, event_type=None, event_data=None):
         logger.debug(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")
         self.tts.generate_tts(event_data)
-        self.produce_event(TTSDoneEvent(["TTS_GENERATION_FINISHED"], 1))
+        self.produce_event(TTSDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
         return True
 
     def get_event_handlers(self):
