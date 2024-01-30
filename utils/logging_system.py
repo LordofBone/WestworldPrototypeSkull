@@ -41,20 +41,23 @@ def get_locked_root_logger():
     return logging.root
 
 
-# Use the custom function to get the root logger
-logger = get_locked_root_logger()
+def activate_logging_system():
+    # todo: find out why this works slightly differently when called as a function vs part of module import; some things
+    # get missed in debug logging in some modules when called this way
+    # Use the custom function to get the root logger
+    logger = get_locked_root_logger()
 
-# Now the rest of your initialization code
-numeric_level = getattr(logging, log_level.upper(), None)
-if not isinstance(numeric_level, int):
-    raise ValueError(f'Invalid log level: {log_level}')
+    # Now the rest of your initialization code
+    numeric_level = getattr(logging, log_level.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError(f'Invalid log level: {log_level}')
 
-logger.setLevel(numeric_level)
+    logger.setLevel(numeric_level)
 
-console_handler = LockedStreamHandler()
-console_handler.setLevel(numeric_level)
-formatter = logging.Formatter(log_format)
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+    console_handler = LockedStreamHandler()
+    console_handler.setLevel(numeric_level)
+    formatter = logging.Formatter(log_format)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
 
-logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
