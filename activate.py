@@ -1,9 +1,12 @@
+import argparse
 import logging
-
-from utils import logging_system
-
 from time import sleep
 
+from config.path_config import setup_paths
+
+from utils.logging_system import activate_logging_system
+
+setup_paths()
 from EventHive.event_hive_runner import EventQueue
 from components.conversation_engine import ConversationEngine
 from components.jaw_system import AudioJawSync
@@ -13,11 +16,21 @@ from components.tts_system import TTSOperations
 
 BOOT_SPLIT_WAIT = 5
 
+activate_logging_system()
 logger = logging.getLogger(__name__)
 
 
+# Add argparse to handle command line arguments
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Run the ChattingGPT system.")
+    parser.add_argument("--demo_mode", action="store_true", help="Run in demo mode")
+    return parser.parse_args()
+
+
 def main():
-    logger.debug("Setting up systems")
+    args = parse_arguments()
+    demo_mode = args.demo_mode
+    logger.debug(f"Setting up systems in {'demo' if demo_mode else 'normal'} mode")
 
     event_queue = EventQueue()
     systems = [
@@ -25,7 +38,7 @@ def main():
         AudioDetector(event_queue),
         TTSOperations(event_queue),
         AudioJawSync(event_queue),
-        ConversationEngine(event_queue),
+        ConversationEngine(event_queue, demo_mode=demo_mode),
     ]
 
     logging.debug("Starting producer and consumer threads")
