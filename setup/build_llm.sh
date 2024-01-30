@@ -1,0 +1,1 @@
+ollama create westworld-prototype -f ./Modelfile
