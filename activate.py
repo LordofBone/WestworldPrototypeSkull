@@ -4,6 +4,7 @@ from time import sleep
 
 from config.path_config import setup_paths
 from utils.logging_system import activate_logging_system
+
 activate_logging_system()
 setup_paths()
 from EventHive.event_hive_runner import EventQueue
@@ -39,16 +40,21 @@ def main():
         ConversationEngine(event_queue, demo_mode=demo_mode),
     ]
 
-    logging.debug("Starting producer and consumer threads")
+    logger.debug("Starting producer and consumer threads")
 
     try:
         for system in systems:
+            logger.debug(f"Starting {system.__class__.__name__} thread")
             system.start()
             sleep(BOOT_SPLIT_WAIT)
+            logger.debug(f"Started {system.__class__.__name__} thread")
 
-        logging.debug("Waiting for threads to finish")
         for system in systems[1:]:  # Skip LedResourceMonitor, it doesn't join
+            logger.debug(f"Joining {system.__class__.__name__} thread")
             system.join()
+            logger.debug(f"Joined {system.__class__.__name__} thread")
+
+        logger.debug("All systems started and threads joined")
 
     except KeyboardInterrupt:
         systems[0].stop()  # Stop LedResourceMonitor
