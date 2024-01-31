@@ -23,13 +23,11 @@ demo_text = "Hello, my name is Skull. I am a conversational AI. I am a demo vers
 audio_on = True
 file_name = "tts_output.wav"
 
-# nix_dir = Path(__file__).parent.parent / 'nix-tts'
-
 jaw_test_audio_path = Path(__file__).parent.parent / 'audio' / 'jaw_test.wav'
 
 whisper_test_audio_path = Path(__file__).parent.parent / 'audio' / 'whisper_test.wav'
 
-tts_audio_path = Path(__file__).parent.parent / 'audio' / 'tts_output.wav'
+tts_audio_path = Path(__file__).parent.parent / 'audio' / file_name
 
 sys.path.append(str(jaw_test_audio_path))
 
