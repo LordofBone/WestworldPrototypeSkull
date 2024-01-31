@@ -13,6 +13,7 @@ from components.jaw_system import AudioJawSync
 from components.audio_detector_runner import AudioDetector
 from components.resource_monitor_leds import LedResourceMonitor
 from components.tts_system import TTSOperations
+from components.stt_system import STTOperations
 
 BOOT_SPLIT_WAIT = 5
 
@@ -36,6 +37,7 @@ def main():
         LedResourceMonitor(),
         AudioDetector(event_queue),
         TTSOperations(event_queue),
+        STTOperations(event_queue),
         AudioJawSync(event_queue),
         ConversationEngine(event_queue, demo_mode=demo_mode),
     ]
