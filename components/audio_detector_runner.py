@@ -9,7 +9,6 @@ from config.audio_config import audio_input_detection_threshold
 from config.custom_events import DetectEvent, AudioDetectControllerEvent, TTSDoneEvent
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 
 class AudioDetector(EventActor):
@@ -20,9 +19,12 @@ class AudioDetector(EventActor):
         self.mic_key = "DETECTION_MIC"
         audio_engine_access().set_microphone_name(self.mic_key, "USB PnP Sound Device")
         self.scan_thread = None
-        logger.debug(f"Audio detection threshold: {audio_input_detection_threshold}")
+
+        logger.debug("Initialized")
 
     def audio_scan(self):
+        logger.debug(f"Audio scan enabled with detection threshold: {audio_input_detection_threshold}")
+
         while True:
             if self.scan_mode_enabled:
                 audio_data = audio_engine_access().read_recording_stream(self.mic_key)
@@ -35,7 +37,6 @@ class AudioDetector(EventActor):
                     self.scan_mode_off()
 
     def scan_mode_on(self, event_type=None, event_data=None):
-        logger.debug("SCAN MODE ON")
         # Spawn a new thread to run the audio scan function
         if not self.scan_thread:
             self.scan_thread = threading.Thread(target=self.audio_scan, daemon=True)
@@ -45,12 +46,15 @@ class AudioDetector(EventActor):
 
         audio_engine_access().init_recording_stream(mic_key=self.mic_key)
         self.scan_mode_enabled = True
+        logger.debug("Scan mode on, mic opened")
+
         return True
 
     def scan_mode_off(self, event_type=None, event_data=None):
-        logger.debug("SCAN MODE OFF")
         audio_engine_access().close_recording_stream(mic_key=self.mic_key)
         self.scan_mode_enabled = False
+        logger.debug("Scan mode off, mic closed")
+
         return True
 
     def get_event_handlers(self):

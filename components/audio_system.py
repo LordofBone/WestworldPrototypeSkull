@@ -8,7 +8,6 @@ from playsound import playsound
 from config.tts_config import audio_on, file_name
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 condition = Condition()
 
@@ -75,6 +74,8 @@ class AudioEngine:
         self.audio_file = self.path / file_name
         self.online = self.path / "online.wav"
         self.training = self.path / "training.wav"
+
+        logger.debug("Initialized")
 
     def set_microphone_name(self, mic_key, mic_name):
         self.microphones[mic_key] = mic_name

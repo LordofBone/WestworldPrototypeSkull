@@ -15,7 +15,6 @@ from config.tts_config import tts_mode, nix_dir, audio_dir, file_name, stoch_mod
 sys.path.append(nix_dir)
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 
 class AbstractTTSOperations(ABC):
@@ -79,6 +78,8 @@ class TTSOperations(EventActor):
             logger.debug(f"{tts_mode} initiated")
         except KeyError:
             raise ValueError(f'Invalid tts_mode: {tts_mode}')
+
+        logger.debug("Initialized with TTS mode: {tts_mode}")
 
     def generate_tts(self, event_type=None, event_data=None):
         logger.debug(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")

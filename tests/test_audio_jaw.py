@@ -5,7 +5,7 @@ top_dir = Path(__file__).parent.parent
 
 sys.path.append(str(top_dir))
 
-import utils.logging_system
+from utils.logging_system import activate_logging_system
 from EventHive.event_hive_runner import EventQueue
 from components.jaw_system import AudioJawSync
 from config.custom_events import MovementEvent
@@ -14,6 +14,10 @@ import unittest
 import logging
 import threading
 from time import sleep
+
+activate_logging_system()
+
+logger = logging.getLogger(__name__)
 
 
 class EnhancedAudioJawSyncTest(unittest.TestCase):
@@ -34,7 +38,7 @@ class EnhancedAudioJawSyncTest(unittest.TestCase):
                 try:
                     thread.join(1)  # Give the thread 1 second to finish
                 except Exception as e:
-                    logging.error(f"Error stopping thread: {e}")
+                    logger.error(f"Error stopping thread: {e}")
 
         # If there's any other cleanup specific to your application, add them here
 
@@ -45,22 +49,22 @@ class EnhancedAudioJawSyncTest(unittest.TestCase):
 class TestExistingMethods(EnhancedAudioJawSyncTest):
 
     def test_audiofile_to_jaw(self):
-        logging.debug("Testing audiofile to jaw")
+        logger.debug("Testing audiofile to jaw")
         event = MovementEvent(["JAW_TTS_AUDIO", jaw_test_audio_path], 1)
         self.event_queue.queue_addition(event)
         sleep(5)  # Give some time for the audio to play and be analyzed
         while self.audio_jaw_sync.analyzing:
             pass
-        logging.debug("Done testing audiofile to jaw")
+        logger.debug("Done testing audiofile to jaw")
 
     def test_mic_to_jaw(self):
-        logging.debug("Testing mic to jaw")
+        logger.debug("Testing mic to jaw")
         event = MovementEvent(["JAW_TTS_AUDIO"], 1)
         self.event_queue.queue_addition(event)
         sleep(5)  # Give some time for the mic audio to be analyzed
         while self.audio_jaw_sync.analyzing:
             pass
-        logging.debug("Done testing mic to jaw")
+        logger.debug("Done testing mic to jaw")
 
 
 if __name__ == '__main__':

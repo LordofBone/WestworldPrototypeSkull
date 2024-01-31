@@ -13,7 +13,6 @@ from config.path_config import tts_audio_path
 from config.tts_config import shutdown_text, reboot_text, demo_text
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 
 class ConversationEngine(EventActor):
@@ -42,12 +41,16 @@ class ConversationEngine(EventActor):
 
         self.produce_event(AudioDetectControllerEvent(["SCAN_MODE_ON"], 1))
 
+        logger.debug("Initialized")
+
     def speak_tts(self, text, event_type=None, event_data=None):
         """
         This function is used to speak custom text.
         :return:
         """
         self.produce_event(TTSEvent(["TALK"], 1))
+
+        logger.debug(f"TTS event produced with text: {text}")
 
         return True
 
@@ -59,6 +62,8 @@ class ConversationEngine(EventActor):
 
         self.produce_event(TTSEvent(["GENERATE_TTS", self.bot_response], 1))
 
+        logger.debug(f"TTS event produced with text: {self.bot_response}")
+
         return True
 
     def scan_mode_on(self, event_type=None, event_data=None):
@@ -69,6 +74,8 @@ class ConversationEngine(EventActor):
 
         self.produce_event(AudioDetectControllerEvent(["SCAN_MODE_ON"], 1))
 
+        logger.debug("Bot is waiting to detect human presence by listening for noise.")
+
         return True
 
     def listen_stt(self, event_type=None, event_data=None):
@@ -76,7 +83,6 @@ class ConversationEngine(EventActor):
         This is the main function that runs the STT and bot interaction.
         :return:
         """
-        print("Finished speaking")
 
         logger.debug("Listening")
 
@@ -90,9 +96,7 @@ class ConversationEngine(EventActor):
 
         self.inference_output = profanity.censor(unfiltered_inference_output, '-')
 
-        logger.debug("Finished inferencing")
-
-        logger.debug(f"Inference output: {self.inference_output}")
+        logger.debug(f"Finished inferencing, output: {self.inference_output}")
 
         return True
 
@@ -104,12 +108,17 @@ class ConversationEngine(EventActor):
         if self.inference_output == "SHUTDOWN":
             self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
             self.produce_event(HardwareEvent(["SHUTDOWN"], 1))
+            logger.debug("Command checker finished, event output: SHUTDOWN")
         elif self.inference_output == "SHUT DOWN":
             self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
             self.produce_event(HardwareEvent(["SHUTDOWN"], 1))
+            logger.debug("Command checker finished, event output: SHUTDOWN")
         elif self.inference_output == "REBOOT":
             self.produce_event(TTSEvent(["GENERATE_TTS", reboot_text], 1))
             self.produce_event(HardwareEvent(["REBOOT"], 1))
+            logger.debug("Command checker finished, event output: REBOOT")
+        else:
+            logger.debug("Command checker finished, no commands detected")
 
         return True
 
@@ -119,6 +128,7 @@ class ConversationEngine(EventActor):
         :return:
         """
         self.bot_response = self.ChatGPT_handler.get_response(self.inference_output)
+
         logger.debug(f"Bot response: {self.bot_response}")
 
         return True
@@ -129,7 +139,7 @@ class ConversationEngine(EventActor):
         :return:
         """
         self.produce_event(MovementEvent(["JAW_TTS_AUDIO", tts_audio_path], 1))
-        logging.debug(f"Jaw audio activated with audio file: {tts_audio_path}")
+        logger.debug(f"Jaw audio event produced with audio file: {tts_audio_path}")
 
         return True
 
@@ -138,9 +148,11 @@ class ConversationEngine(EventActor):
         This function returns the bot response.
         :return:
         """
-        logger.debug("All functions have been executed.")
+
         self.functions_list = []
         self.current_index = 0
+
+        logger.debug("All functions have been executed, action list and index reset.")
 
         return True
 
@@ -151,7 +163,6 @@ class ConversationEngine(EventActor):
         """
 
         if self.demo_mode:
-            logger.debug("Demo mode activated")
             self.functions_list = [
                 'generate_tts_bot_response',
                 'activate_jaw_audio',
@@ -170,6 +181,9 @@ class ConversationEngine(EventActor):
             ]
             self.bot_response = "Listening"
 
+        logger.debug(f"Conversation activated, demo mode: {self.demo_mode} "
+                     f"with response: {self.bot_response} and functions list: {self.functions_list}")
+
         self.next_action()
 
         return True
@@ -184,7 +198,7 @@ class ConversationEngine(EventActor):
         :param event_data:
         :return:
         """
-        logging.debug(f"Next action called, with functions list: {self.functions_list}")
+        logger.debug(f"Next action called, with functions list: {self.functions_list}")
         if self.functions_list:  # This checks if the list is not empty
             if self.current_index < len(self.functions_list):
                 func_name = self.functions_list[self.current_index]
@@ -196,9 +210,10 @@ class ConversationEngine(EventActor):
 
                 return True
             else:
-                logger.debug("All functions have been executed.")
                 self.functions_list = []
                 self.current_index = 0
+
+                logger.debug("All functions have been executed, action list and index reset.")
 
                 return True
         else:
@@ -212,7 +227,6 @@ class ConversationEngine(EventActor):
         """
         return {
             "HUMAN_DETECTED": self.conversation_cycle,
-            # "TTS_GENERATION_FINISHED": self.activate_jaw_audio,
             "CONVERSATION_ACTION_FINISHED": self.next_action,
         }
 

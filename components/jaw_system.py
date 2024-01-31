@@ -11,7 +11,6 @@ from config.custom_events import MovementEvent, TTSDoneEvent
 from hardware.jaw_controller import JawController
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 
 class AudioJawSync(EventActor):
@@ -40,6 +39,8 @@ class AudioJawSync(EventActor):
         # Normalize RMS value to desired pulse width range (25 to 75)
         self.min_pulse_width = self.servo_controller.close_pulse_width
         self.max_pulse_width = self.servo_controller.open_pulse_width
+
+        logger.debug("Initialized")
 
     def set_jaw_position(self, pulse_width, event_type=None, event_data=None):
         self.servo_controller.set_pulse_width(pulse_width)

@@ -7,7 +7,6 @@ import psutil
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
 logger = logging.getLogger(__name__)
-logger.debug("Initialized")
 
 
 class LedResourceMonitor:
@@ -21,7 +20,8 @@ class LedResourceMonitor:
         self.current_cpu_percentage = 0.0
         self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self.update_leds)
-        logger.debug("LED Resource Monitor initialized.")
+
+        logger.debug("Initialized")
 
     def sleep_until(self, end_time):
         time_to_sleep = end_time - time.monotonic()
