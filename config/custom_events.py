@@ -57,9 +57,9 @@ class TTSEvent(Event):
         return self.__class__
 
 
-class TTSDoneEvent(Event):
+class ConversationDoneEvent(Event):
     def __init__(self, content, priority):
-        super().__init__("TTS_Done_Event", content, priority)
+        super().__init__("Conversation_Done_Event", content, priority)
 
     def get_event_type(self):
         return self.__class__

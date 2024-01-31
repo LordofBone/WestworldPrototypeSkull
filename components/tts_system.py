@@ -8,7 +8,7 @@ import soundfile as sf
 from fakeyou.fakeyou import FakeYou
 
 from EventHive.event_hive_runner import EventActor
-from config.custom_events import TTSEvent, TTSDoneEvent
+from config.custom_events import TTSEvent, ConversationDoneEvent
 from config.fakeyou_config import username, password, voice_model
 from config.tts_config import tts_mode, nix_dir, audio_dir, file_name, stoch_model_path, pyttsx3_voice
 
@@ -84,7 +84,7 @@ class TTSOperations(EventActor):
     def generate_tts(self, event_type=None, event_data=None):
         logger.debug(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")
         self.tts.generate_tts(event_data)
-        self.produce_event(TTSDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
         return True
 
     def get_event_handlers(self):

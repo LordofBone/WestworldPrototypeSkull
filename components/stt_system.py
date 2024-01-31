@@ -5,7 +5,7 @@ from better_profanity import profanity
 from EventHive.event_hive_runner import EventActor
 from Lakul.integrate_stt import SpeechtoTextHandler
 from config.audio_config import microphone_name
-from config.custom_events import STTEvent, STTDoneEvent
+from config.custom_events import STTEvent, STTDoneEvent, ConversationDoneEvent
 from config.stt_config import profanity_censor_enabled, offline_mode, model_size, stt_audio_path
 
 logger = logging.getLogger(__name__)
@@ -17,9 +17,6 @@ class STTOperations(EventActor):
     def __init__(self, event_queue):
         super().__init__(event_queue)
 
-        """
-        Initialize the STT system.
-        """
         self.profanity_censor_enabled = profanity_censor_enabled
 
         self.STT_handler = SpeechtoTextHandler(stt_microphone_name=microphone_name, stt_audio_file=stt_audio_path,
@@ -61,6 +58,8 @@ class STTOperations(EventActor):
         """
         self.initiate_recording()
         self.run_inference()
+
+        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
 
     def get_event_handlers(self):
         """

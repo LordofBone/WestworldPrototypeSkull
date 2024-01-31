@@ -1,14 +1,10 @@
 import logging
 
-from better_profanity import profanity
-
 from ChattingGPT.integrate_chatgpt import IntegrateChatGPT, IntegrateOllama
 from EventHive.event_hive_runner import EventActor
-from Lakul.integrate_stt import SpeechtoTextHandler
-from config.audio_config import microphone_name
 from config.chattinggpt_config import openai_api_key, role, chat_backend, use_history, ollama_model
-from config.custom_events import TTSEvent, HardwareEvent, MovementEvent, DetectEvent, TTSDoneEvent, \
-    AudioDetectControllerEvent
+from config.custom_events import (STTEvent, TTSEvent, HardwareEvent, MovementEvent, DetectEvent, STTDoneEvent,
+                                  ConversationDoneEvent, AudioDetectControllerEvent)
 from config.path_config import tts_audio_path
 from config.tts_config import shutdown_text, reboot_text, demo_text
 
@@ -27,8 +23,6 @@ class ConversationEngine(EventActor):
         self.functions_list = []
 
         self.current_index = 0
-
-        self.STT_handler = SpeechtoTextHandler(microphone_name)
 
         if chat_backend == "gpt":
             self.ChatGPT_handler = IntegrateChatGPT(openai_api_key=openai_api_key, role=role, use_history=use_history)
@@ -84,21 +78,16 @@ class ConversationEngine(EventActor):
         :return:
         """
 
-        logger.debug("Listening")
+        self.produce_event(STTEvent(["RECORD_INFER_SPEECH"], 1))
 
-        self.STT_handler.initiate_recording(max_seconds=60, silence_threshold=1000, silence_duration=2000)
-
-        logger.debug("Inferencing")
-
-        unfiltered_inference_output = self.STT_handler.run_inference()
-
-        logger.debug(f"Unfiltered inference output: {unfiltered_inference_output}")
-
-        self.inference_output = profanity.censor(unfiltered_inference_output, '-')
-
-        logger.debug(f"Finished inferencing, output: {self.inference_output}")
+        logger.debug("STT event produced, recording and inferring speech.")
 
         return True
+
+    def set_bot_response(self, event_type=None, event_data=None):
+        self.inference_output = event_data
+
+        logger.debug(f"Retrieved Speech to Text output and set bot response to: {self.inference_output}")
 
     def command_checker(self, event_type=None, event_data=None):
         """
@@ -203,7 +192,8 @@ class ConversationEngine(EventActor):
             if self.current_index < len(self.functions_list):
                 func_name = self.functions_list[self.current_index]
                 logger.debug(
-                    f"Running next action: {func_name}, current index: {self.current_index}, total length: {len(self.functions_list)}")
+                    f"Running next action: {func_name}, current index: {self.current_index}, "
+                    f"total length: {len(self.functions_list)}")
                 self.current_index += 1
                 func = getattr(self, func_name)
                 func()
@@ -228,6 +218,7 @@ class ConversationEngine(EventActor):
         return {
             "HUMAN_DETECTED": self.conversation_cycle,
             "CONVERSATION_ACTION_FINISHED": self.next_action,
+            "STT_FINISHED": self.set_bot_response,
         }
 
     def get_consumable_events(self):
@@ -235,4 +226,4 @@ class ConversationEngine(EventActor):
         This method returns a list of event types that this consumer can consume.
         :return:
         """
-        return [DetectEvent, TTSDoneEvent]
+        return [DetectEvent, ConversationDoneEvent, STTDoneEvent]
