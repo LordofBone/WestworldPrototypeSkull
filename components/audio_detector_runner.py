@@ -6,7 +6,7 @@ import numpy as np
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import audio_engine_access
 from config.audio_config import audio_input_detection_threshold
-from config.custom_events import DetectEvent, AudioDetectControllerEvent, TTSDoneEvent
+from config.custom_events import DetectEvent, AudioDetectControllerEvent, ConversationDoneEvent
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class AudioDetector(EventActor):
             self.scan_thread = threading.Thread(target=self.audio_scan, daemon=True)
             self.scan_thread.start()
         else:
-            self.produce_event(TTSDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+            self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
 
         audio_engine_access().init_recording_stream(mic_key=self.mic_key)
         self.scan_mode_enabled = True

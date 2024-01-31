@@ -7,7 +7,7 @@ import numpy as np
 from EventHive.event_hive_runner import EventActor
 from components.audio_system import audio_engine_access
 from config.audio_config import loopback_name, microphone_name
-from config.custom_events import MovementEvent, TTSDoneEvent
+from config.custom_events import MovementEvent, ConversationDoneEvent
 from hardware.jaw_controller import JawController
 
 logger = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ class AudioJawSync(EventActor):
                 self.analyzing = False
         finally:
             self.analyzing = False
-            self.produce_event(TTSDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+            self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
             return True
 
     def get_event_handlers(self):
