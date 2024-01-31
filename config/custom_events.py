@@ -33,6 +33,22 @@ class DetectEvent(Event):
         return self.__class__
 
 
+class STTEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("STT_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
+class STTDoneEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("STT_Done_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
 class TTSEvent(Event):
     def __init__(self, content, priority):
         super().__init__("TTS_Event", content, priority)
