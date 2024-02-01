@@ -57,6 +57,22 @@ class TTSEvent(Event):
         return self.__class__
 
 
+class BotEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("Bot_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
+class BotDoneEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("Bot_Done_Event", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
 class ConversationDoneEvent(Event):
     def __init__(self, content, priority):
         super().__init__("Conversation_Done_Event", content, priority)
