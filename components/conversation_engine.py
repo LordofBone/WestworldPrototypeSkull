@@ -6,7 +6,7 @@ from config.chattinggpt_config import openai_api_key, role, chat_backend, use_hi
 from config.custom_events import (STTEvent, TTSEvent, HardwareEvent, MovementEvent, DetectEvent, STTDoneEvent,
                                   ConversationDoneEvent, AudioDetectControllerEvent)
 from config.path_config import tts_audio_path
-from config.tts_config import shutdown_text, reboot_text, demo_text
+from config.tts_config import shutdown_text, reboot_text, demo_text, greeting_text
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class ConversationEngine(EventActor):
 
         self.inference_output = None
 
-        self.bot_response = None
+        self.bot_response = greeting_text
 
         self.produce_event(AudioDetectControllerEvent(["SCAN_MODE_ON"], 1))
 
@@ -84,10 +84,12 @@ class ConversationEngine(EventActor):
 
         return True
 
-    def set_bot_response(self, event_type=None, event_data=None):
+    def set_inference_output(self, event_type=None, event_data=None):
         self.inference_output = event_data
 
-        logger.debug(f"Retrieved Speech to Text output and set bot response to: {self.inference_output}")
+        logger.debug(f"Retrieved Speech to Text output and set output response to: {self.inference_output}")
+
+        return True
 
     def command_checker(self, event_type=None, event_data=None):
         """
@@ -159,16 +161,12 @@ class ConversationEngine(EventActor):
             ]
             self.bot_response = demo_text
         else:
-            logger.debug("Conversation activated")
             self.functions_list = [
                 'generate_tts_bot_response',
                 'activate_jaw_audio',
                 'listen_stt',
-                'generate_tts_bot_response',
-                'activate_jaw_audio',
                 'scan_mode_on',
             ]
-            self.bot_response = "Listening"
 
         logger.debug(f"Conversation activated, demo mode: {self.demo_mode} "
                      f"with response: {self.bot_response} and functions list: {self.functions_list}")
@@ -218,7 +216,7 @@ class ConversationEngine(EventActor):
         return {
             "HUMAN_DETECTED": self.conversation_cycle,
             "CONVERSATION_ACTION_FINISHED": self.next_action,
-            "STT_FINISHED": self.set_bot_response,
+            "STT_FINISHED": self.set_inference_output,
         }
 
     def get_consumable_events(self):
