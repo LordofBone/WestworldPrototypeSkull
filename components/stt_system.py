@@ -27,19 +27,13 @@ class STTOperations(EventActor):
         Initiate recording.
         :return:
         """
-        logger.debug("Listening")
-
         self.STT_handler.initiate_recording(max_seconds=60, silence_threshold=1000, silence_duration=2000)
-
-        logger.debug("Finished listening")
 
     def run_inference(self):
         """
         Run speech inference.
         :return:
         """
-        logger.debug("Inferencing")
-
         inference_output = self.STT_handler.run_inference()
 
         logger.debug(f"Unfiltered inference output: {inference_output}")
@@ -51,7 +45,7 @@ class STTOperations(EventActor):
 
         self.produce_event(STTDoneEvent(["STT_FINISHED", inference_output], 1))
 
-    def record_and_infer(self):
+    def record_and_infer(self, event_type=None, event_data=None):
         """
         This function is used to record audio and run inference.
         :return:
@@ -60,6 +54,8 @@ class STTOperations(EventActor):
         self.run_inference()
 
         self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+
+        return True
 
     def get_event_handlers(self):
         """
