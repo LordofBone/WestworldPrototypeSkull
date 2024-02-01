@@ -85,9 +85,19 @@ class ConversationEngine(EventActor):
         return True
 
     def set_inference_output(self, event_type=None, event_data=None):
-        self.inference_output = event_data
-
-        logger.debug(f"Retrieved Speech to Text output and set output response to: {self.inference_output}")
+        """
+        This function sets the inference output.
+        :param event_type:
+        :param event_data:
+        :return:
+        """
+        # Check if the string is empty or contains only whitespace
+        if self.inference_output.strip() == "":
+            self.current_index = 0
+            logger.debug("The inference output is empty, resetting action list index.")
+        else:
+            self.inference_output = event_data
+            logger.debug(f"Retrieved Speech to Text output and set output response to: {self.inference_output}")
 
         return True
 
