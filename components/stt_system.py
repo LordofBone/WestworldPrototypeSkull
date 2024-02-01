@@ -53,7 +53,7 @@ class STTOperations(EventActor):
         self.initiate_recording()
         self.run_inference()
 
-        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 2))
 
         return True
 
