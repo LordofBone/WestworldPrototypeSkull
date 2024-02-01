@@ -152,7 +152,7 @@ class AudioEngine:
 
     def init_recording_stream(self, mic_key):
         mic_info = self.microphones.get(mic_key)
-        print(mic_info)
+        logger.debug(f"Initializing recording stream for {mic_key}, mic_info: {mic_info}")
         if not mic_info:
             logger.error(f"Microphone {mic_key} not initialized")
             return
