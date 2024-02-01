@@ -165,6 +165,7 @@ class ConversationEngine(EventActor):
                 'generate_tts_bot_response',
                 'activate_jaw_audio',
                 'listen_stt',
+                'get_bot_engine_response',
                 'scan_mode_on',
             ]
 
