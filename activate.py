@@ -14,6 +14,8 @@ from components.audio_detector_runner import AudioDetector
 from components.resource_monitor_leds import LedResourceMonitor
 from components.tts_system import TTSOperations
 from components.stt_system import STTOperations
+from components.chatbot_system import ChatbotOperations
+from components.command_system import CommandCheckOperations
 
 BOOT_SPLIT_WAIT = 5
 
@@ -24,21 +26,33 @@ logger = logging.getLogger(__name__)
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Run the ChattingGPT system.")
     parser.add_argument("--demo_mode", action="store_true", help="Run in demo mode")
+    parser.add_argument("--test_mode", action="store_true", help="Run in full run test mode")
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
     demo_mode = args.demo_mode
-    logger.debug(f"Setting up systems in {'demo' if demo_mode else 'normal'} mode")
+    test_mode = args.test_mode
+
+    modes = []
+    if demo_mode:
+        modes.append('demo')
+    if test_mode:
+        modes.append('test')
+
+    mode_str = ', '.join(modes) if modes else 'normal'
+    logger.debug(f"Setting up systems in {mode_str} mode")
 
     event_queue = EventQueue()
     systems = [
         LedResourceMonitor(),
-        AudioDetector(event_queue),
-        TTSOperations(event_queue),
-        STTOperations(event_queue),
-        AudioJawSync(event_queue),
+        AudioDetector(event_queue, test_mode=test_mode),
+        TTSOperations(event_queue, test_mode=test_mode),
+        STTOperations(event_queue, test_mode=test_mode),
+        AudioJawSync(event_queue, test_mode=test_mode),
+        ChatbotOperations(event_queue, test_mode=test_mode),
+        CommandCheckOperations(event_queue, test_mode=test_mode),
         ConversationEngine(event_queue, demo_mode=demo_mode),
     ]
 
