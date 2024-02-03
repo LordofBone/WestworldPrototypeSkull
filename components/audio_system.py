@@ -92,6 +92,8 @@ class AudioEngine:
             'CHUNK': self.CHUNK
         }
 
+        logger.debug(f"Microphone {mic_key} set to {mic_name}, device: {input_device}, RATE: {self.RATE}, CHUNK: {self.CHUNK}")
+
     def find_input_device(self, mic_name):
         # List all audio devices
         for i in range(self.p.get_device_count()):
