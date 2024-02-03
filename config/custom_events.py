@@ -17,6 +17,22 @@ class TalkEvent(Event):
         return self.__class__
 
 
+class CommandCheckEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("COMMAND_CHECK_EVENT", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
+class CommandCheckDoneEvent(Event):
+    def __init__(self, content, priority):
+        super().__init__("COMMAND_CHECK_DONE_EVENT", content, priority)
+
+    def get_event_type(self):
+        return self.__class__
+
+
 class MovementEvent(Event):
     def __init__(self, content, priority):
         super().__init__("MOVEMENT_EVENT", content, priority)
