@@ -27,7 +27,6 @@ class TTSOperationsNix(AbstractTTSOperations):
     def __init__(self):
         self.filename = f'{audio_dir}/{file_name}'
         self.sampling_frequency = 22050
-
         mod = importlib.import_module('nix-tts.nix.models.TTS')
         klass = getattr(mod, 'NixTTSInference')
         self.nix_tts = klass(model_dir=stoch_model_path)
@@ -53,7 +52,6 @@ class TTSOperationsPyTTSx3(AbstractTTSOperations):
     def __init__(self):
         self.engine = pyttsx3.init()
         self.voices = self.engine.getProperty('voices')
-        logger.debug(f"Voices: {self.voices}")
         self.engine.setProperty('voice', self.voices[pyttsx3_voice].id)
         self.filename = f'{audio_dir}/{file_name}'
 
@@ -62,24 +60,27 @@ class TTSOperationsPyTTSx3(AbstractTTSOperations):
         self.engine.runAndWait()
 
 
+class TestTTSHandler(AbstractTTSOperations):
+    def generate_tts(self, text_input):
+        logger.debug("Test mode: Skipping actual TTS generation")
+
+
 class TTSOperations(EventActor):
-    def __init__(self, event_queue):
+    def __init__(self, event_queue, test_mode=False):
         super().__init__(event_queue)
         self.filename = f'{audio_dir}/{file_name}'
 
         tts_class_map = {
             'nix': TTSOperationsNix,
             'fakeyou': TTSOperationsFakeYou,
-            'pyttsx3': TTSOperationsPyTTSx3
+            'pyttsx3': TTSOperationsPyTTSx3,
+            'test': TestTTSHandler  # Handling test mode
         }
 
-        try:
-            self.tts = tts_class_map[tts_mode]()
-            logger.debug(f"{tts_mode} initiated")
-        except KeyError:
+        self.tts = tts_class_map.get('test')() if test_mode else tts_class_map.get(tts_mode)()
+        if self.tts is None:
             raise ValueError(f'Invalid tts_mode: {tts_mode}')
-
-        logger.debug(f"Initialized with TTS mode: {tts_mode}")
+        logger.debug(f"Initialized with TTS mode: {self.tts.__class__.__name__}")
 
     def generate_tts(self, event_type=None, event_data=None):
         logger.debug(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")
@@ -88,7 +89,9 @@ class TTSOperations(EventActor):
         return True
 
     def get_event_handlers(self):
-        return {"GENERATE_TTS": self.generate_tts}
+        return {
+            "GENERATE_TTS": self.generate_tts
+        }
 
     def get_consumable_events(self):
         return [TTSEvent]
