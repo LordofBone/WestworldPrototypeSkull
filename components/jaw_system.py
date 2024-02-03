@@ -13,21 +13,43 @@ from hardware.jaw_controller import JawController
 logger = logging.getLogger(__name__)
 
 
+# Define a generic interface for jaw movement handling
+class JawMovementHandler:
+    def start_movement(self, event_type=None, event_data=None):
+        raise NotImplementedError
+
+
+# Implement the real jaw movement handling
+class RealJawMovementHandler(JawMovementHandler):
+    def __init__(self, audio_jaw_sync):
+        self.audio_jaw_sync = audio_jaw_sync
+
+    def start_movement(self, event_type=None, event_data=None):
+        self.audio_jaw_sync.audio_to_jaw_movement(event_type=None, event_data=event_data)
+        # self.audio_jaw_sync.audio_to_jaw_movement(event_data)
+
+
+# Implement the test jaw movement handling
+class TestJawMovementHandler(JawMovementHandler):
+    def __init__(self, audio_jaw_sync):
+        self.audio_jaw_sync = audio_jaw_sync
+
+    def start_movement(self, event_type=None, event_data=None):
+        logger.debug("Jaw Audio Test Mode - No actual movement")
+
+        self.audio_jaw_sync.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+
+        return True
+
+
 class AudioJawSync(EventActor):
-    def __init__(self, event_queue):
+    def __init__(self, event_queue, test_mode=False):
         super().__init__(event_queue)
-
         self.servo_controller = JawController()
-
         self.path = audio_engine_access().path
-
         audio_engine_access().set_microphone_name(mic_key="USB Microphone", mic_name=microphone_name)
         audio_engine_access().set_microphone_name(mic_key="Loopback", mic_name=loopback_name)
-
         self.analyzing = False
-
-        self.rms = None
-        self.data = None
 
         self.hw_accel = False
 
@@ -40,20 +62,27 @@ class AudioJawSync(EventActor):
         self.min_pulse_width = self.servo_controller.close_pulse_width
         self.max_pulse_width = self.servo_controller.open_pulse_width
 
+        self.jaw_movement_handler = TestJawMovementHandler(self) if test_mode else RealJawMovementHandler(self)
         logger.debug("Initialized")
 
     def set_jaw_position(self, pulse_width, event_type=None, event_data=None):
         self.servo_controller.set_pulse_width(pulse_width)
 
     def close_jaw(self, event_type=None, event_data=None):
-        self.set_jaw_position(self.min_pulse_width)
+        self.set_jaw_position(self.servo_controller.close_pulse_width)
 
     def open_jaw(self, event_type=None, event_data=None):
-        self.set_jaw_position(self.max_pulse_width)
+        self.set_jaw_position(self.servo_controller.open_pulse_width)
 
     def calculate_rms_on_cpu(self):
-        # Calculate RMS and clip to max RMS
         self.rms = min(np.sqrt(np.mean(self.data ** 2)), self.max_rms)
+
+    def activate_audio_to_jaw_movement(self, event_type=None, event_data=None):
+        logger.debug("Audio to jaw movement")
+
+        Thread(target=self.jaw_movement_handler.start_movement, args=(event_type, event_data,), daemon=True).start()
+
+        return True
 
     def analyze_audio(self, device="Microphone"):
         audio_engine_access().init_recording_stream(mic_key=device)
@@ -127,17 +156,9 @@ class AudioJawSync(EventActor):
             return True
 
     def get_event_handlers(self):
-        """
-        This method returns a dictionary of event handlers that this consumer can handle.
-        :return:
-        """
         return {
-            "JAW_TTS_AUDIO": self.audio_to_jaw_movement
+            "JAW_TTS_AUDIO": self.activate_audio_to_jaw_movement
         }
 
     def get_consumable_events(self):
-        """
-        This method returns a list of event types that this consumer can consume.
-        :return:
-        """
         return [MovementEvent]
