@@ -20,6 +20,8 @@ reboot_text = "Rebooting the system, please wait."
 shutdown_text = "Shutting down the system, please wait."
 demo_text = "Hello, my name is Skull. I am a conversational AI. I am a demo version of the full Skull AI."
 greeting_text = "Hello"
+override_text = "Override command detected. Activating command system."
+test_text = "Test command detected. Command system working."
 
 audio_on = True
 file_name = "tts_output.wav"
