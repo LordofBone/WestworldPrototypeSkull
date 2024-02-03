@@ -37,7 +37,6 @@ class RealAudioDetectionHandler(AudioDetectionHandler):
 
         while True:
             if self.audio_detector.scan_mode_enabled:
-                sleep(1)
                 audio_data = audio_engine_access().read_recording_stream(self.audio_detector.mic_key)
                 audio_amplitude = np.frombuffer(audio_data, dtype=np.int16)
                 if np.max(audio_amplitude) > audio_input_detection_threshold:
@@ -87,7 +86,7 @@ class AudioDetector(EventActor):
 
     def scan_mode_on(self, event_type=None, event_data=None):
         self.audio_detection_handler.start_scan()
-        self.scan_mode_enabled = True
+
         if not self.scan_thread:
             self.scan_thread = threading.Thread(target=self.audio_detection_handler.audio_scan, daemon=True)
             self.scan_thread.start()
@@ -96,6 +95,8 @@ class AudioDetector(EventActor):
             self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
             logger.debug(f"Audio already setup, thread already started: {self.scan_thread}, so just producing event "
                          f"to move to next conversation action")
+
+        self.scan_mode_enabled = True
 
         return True
 
