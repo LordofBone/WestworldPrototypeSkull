@@ -4,6 +4,7 @@ import time
 
 import psutil
 
+from config.resource_monitor_config import led_brightness
 from hardware.inventor_hat_controller import InventorHATCoreInit
 
 logger = logging.getLogger(__name__)
@@ -14,14 +15,20 @@ class LedResourceMonitor:
     UPDATE_RATE = 1 / UPDATES
     AUTO_SHOW = False  # Update all LEDs at once after they have all been set
     INTERPOLATION_SPEED = 0.1  # Speed of interpolation (higher is faster)
+    LED_BRIGHTNESS = led_brightness  # Default LED brightness (0.0 to 1.0)
 
-    def __init__(self):
+    def __init__(self, brightness=1.0):
         self.current_mem_percentage = 0.0
         self.current_cpu_percentage = 0.0
         self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self.update_leds)
+        self.set_brightness(brightness)  # Set the initial brightness
 
         logger.debug("Initialized")
+
+    def set_brightness(self, brightness):
+        """Set the brightness level for the LEDs."""
+        self.LED_BRIGHTNESS = max(0.0, min(1.0, brightness))  # Clamp value between 0.0 and 1.0
 
     def sleep_until(self, end_time):
         time_to_sleep = end_time - time.monotonic()
@@ -44,11 +51,13 @@ class LedResourceMonitor:
 
             hue = 0.33 * (1.0 - self.current_cpu_percentage)
 
+            # todo: find out why the LED_BRIGHTNESS is not working on the inventor HAT
             for i in range(InventorHATCoreInit.num_leds):
                 if float(i) / InventorHATCoreInit.num_leds <= self.current_mem_percentage:
-                    InventorHATCoreInit.leds.set_hsv(i, hue, 1.0, self.current_mem_percentage, show=self.AUTO_SHOW)
+                    InventorHATCoreInit.leds.set_hsv(i, hue, 1.0, self.LED_BRIGHTNESS * self.current_mem_percentage,
+                                                     show=self.AUTO_SHOW)
                 else:
-                    InventorHATCoreInit.leds.set_hsv(i, 0, 0, 0)
+                    InventorHATCoreInit.leds.set_hsv(i, 0, 0, 0, self.LED_BRIGHTNESS)
 
             if not self.AUTO_SHOW:
                 InventorHATCoreInit.leds.show()
