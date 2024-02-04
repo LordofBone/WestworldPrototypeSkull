@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 # Add argparse to handle command line arguments
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Run the ChattingGPT system.")
+    parser = argparse.ArgumentParser(description="Activate the system with optional modes.")
     parser.add_argument("--demo_mode", action="store_true", help="Run in demo mode")
     parser.add_argument("--test_mode", action="store_true", help="Run in full run test mode")
     return parser.parse_args()
@@ -44,7 +44,7 @@ def main():
     mode_str = ', '.join(modes) if modes else 'normal'
     logger.debug(f"Setting up systems in {mode_str} mode")
 
-    event_queue = EventQueue()
+    event_queue = EventQueue(sleep_time=1)
     systems = [
         LedResourceMonitor(),
         AudioDetector(event_queue, test_mode=test_mode),
