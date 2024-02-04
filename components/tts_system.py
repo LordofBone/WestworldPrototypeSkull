@@ -66,7 +66,7 @@ class TestTTSHandler(AbstractTTSOperations):
 
 
 class TTSOperations(EventActor):
-    def __init__(self, event_queue, test_mode=False):
+    def __init__(self, event_queue, test_mode=True):
         super().__init__(event_queue)
         self.filename = f'{audio_dir}/{file_name}'
 
