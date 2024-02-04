@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 from EventHive.event_hive_runner import EventActor
-from config.custom_events import HardwareEvent
+from config.custom_events import HardwareEvent, ConversationDoneEvent
 from config.hardware_control_config import shutdown_wait_seconds
 from hardware.linux_command_controller import LinuxCommandProcessor
 
@@ -51,10 +51,12 @@ class PiOperations(EventActor):
 
     def shutdown(self, event_type=None, event_data=None):
         self.operation_handler.shutdown()
+        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 2))
         return True
 
     def reboot(self, event_type=None, event_data=None):
         self.operation_handler.reboot()
+        self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 2))
         return True
 
     def get_event_handlers(self):
