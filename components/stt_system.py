@@ -44,8 +44,10 @@ class TestSTTHandler(STTHandlerInterface):
     def __init__(self):
         self.responses = cycle([
             "stt test response",
+            "another stt test response",
             override_word,
             "shut down",
+            "reboot",
             de_override_word,
         ])
 
