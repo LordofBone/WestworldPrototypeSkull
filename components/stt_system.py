@@ -1,4 +1,5 @@
 import logging
+from itertools import cycle
 from time import sleep
 
 from better_profanity import profanity
@@ -6,6 +7,7 @@ from better_profanity import profanity
 from EventHive.event_hive_runner import EventActor
 from Lakul.integrate_stt import SpeechtoTextHandler
 from config.audio_config import microphone_name
+from config.command_config import override_word, de_override_word
 from config.custom_events import STTEvent, STTDoneEvent, ConversationDoneEvent
 from config.stt_config import profanity_censor_enabled, offline_mode, model_size, stt_audio_path
 
@@ -39,11 +41,19 @@ class RealSTTHandler(STTHandlerInterface):
 
 # Implement the test STT operation handling
 class TestSTTHandler(STTHandlerInterface):
+    def __init__(self):
+        self.responses = cycle([
+            "stt test response",
+            override_word,
+            "shut down",
+            de_override_word,
+        ])
+
     def initiate_recording(self, max_seconds=0, silence_threshold=0, silence_duration=0):
         logger.debug("Test mode: Skipping actual recording")
 
     def run_inference(self):
-        return "stt test response"
+        return next(self.responses)
 
 
 class STTOperations(EventActor):
