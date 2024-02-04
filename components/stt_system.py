@@ -47,6 +47,7 @@ class TestSTTHandler(STTHandlerInterface):
             "another stt test response",
             override_word,
             "shut down",
+            "yet another stt test response",
             "reboot",
             de_override_word,
         ])
