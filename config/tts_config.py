@@ -22,6 +22,7 @@ demo_text = "Hello, my name is Skull. I am a conversational AI. I am a demo vers
 greeting_text = "Hello"
 override_text = "Override command detected. Activating command system."
 test_text = "Test command detected. Command system working."
+test_command_text = "Test command detected. Command system working."
 no_command_text = "I'm sorry, I didn't understand that command."
 
 audio_on = True
