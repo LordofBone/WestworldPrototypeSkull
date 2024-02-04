@@ -71,7 +71,7 @@ class TestAudioDetectionHandler(AudioDetectionHandler):
 
 
 class AudioDetector(EventActor):
-    def __init__(self, event_queue, test_mode=False):
+    def __init__(self, event_queue, test_mode=True):
         super().__init__(event_queue)
         self.scan_mode_enabled = False
         self.scan_thread = None

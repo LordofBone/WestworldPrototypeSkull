@@ -26,7 +26,6 @@ class RealJawMovementHandler(JawMovementHandler):
 
     def start_movement(self, event_type=None, event_data=None):
         self.audio_jaw_sync.audio_to_jaw_movement(event_type=None, event_data=event_data)
-        # self.audio_jaw_sync.audio_to_jaw_movement(event_data)
 
 
 # Implement the test jaw movement handling
@@ -36,14 +35,14 @@ class TestJawMovementHandler(JawMovementHandler):
 
     def start_movement(self, event_type=None, event_data=None):
         logger.debug("Jaw Audio Test Mode - No actual movement")
-
+        # todo: move this produce event into main class?
         self.audio_jaw_sync.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
 
         return True
 
 
 class AudioJawSync(EventActor):
-    def __init__(self, event_queue, test_mode=False):
+    def __init__(self, event_queue, test_mode=True):
         super().__init__(event_queue)
         self.servo_controller = JawController()
         self.path = audio_engine_access().path
