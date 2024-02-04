@@ -45,6 +45,7 @@ class TestSTTHandler(STTHandlerInterface):
         self.responses = cycle([
             "stt test response",
             "another stt test response",
+            "shut down",
             override_word,
             "shut down",
             "yet another stt test response",
