@@ -1,12 +1,13 @@
 import logging
 
-from ChattingGPT.integrate_chatgpt import IntegrateChatGPT, IntegrateOllama
 from EventHive.event_hive_runner import EventActor
-from config.chattinggpt_config import openai_api_key, role, chat_backend, use_history, ollama_model
-from config.custom_events import (STTEvent, TTSEvent, HardwareEvent, MovementEvent, DetectEvent, STTDoneEvent,
-                                  ConversationDoneEvent, AudioDetectControllerEvent)
+from config.conversation_config import conversation_function_list, demo_mode_function_list, command_function_list
+from config.custom_events import (STTEvent, TTSEvent, BotEvent, MovementEvent, DetectEvent, STTDoneEvent, BotDoneEvent,
+                                  ConversationDoneEvent, AudioDetectControllerEvent, CommandCheckEvent,
+                                  CommandCheckDoneEvent, HardwareEvent)
 from config.path_config import tts_audio_path
-from config.tts_config import shutdown_text, reboot_text, demo_text, greeting_text
+from config.tts_config import (demo_text, greeting_text, override_text, test_command_text, no_command_text,
+                               shutdown_text, reboot_text)
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +25,12 @@ class ConversationEngine(EventActor):
 
         self.current_index = 0
 
-        if chat_backend == "gpt":
-            self.ChatGPT_handler = IntegrateChatGPT(openai_api_key=openai_api_key, role=role, use_history=use_history)
-        elif chat_backend == "ollama":
-            self.ChatGPT_handler = IntegrateOllama(model=ollama_model, role=role, use_history=use_history)
-
         self.inference_output = None
 
+        self.run_command = None
+
         self.bot_response = greeting_text
+        self.stored_bot_response = greeting_text
 
         self.produce_event(AudioDetectControllerEvent(["SCAN_MODE_ON"], 1))
 
@@ -53,7 +52,6 @@ class ConversationEngine(EventActor):
         This function is used to speak the bot response.
         :return:
         """
-
         self.produce_event(TTSEvent(["GENERATE_TTS", self.bot_response], 1))
 
         logger.debug(f"TTS event produced with text: {self.bot_response}")
@@ -65,7 +63,6 @@ class ConversationEngine(EventActor):
         This function is used to speak the bot response.
         :return:
         """
-
         self.produce_event(AudioDetectControllerEvent(["SCAN_MODE_ON"], 1))
 
         logger.debug("Bot is waiting to detect human presence by listening for noise.")
@@ -77,7 +74,6 @@ class ConversationEngine(EventActor):
         This is the main function that runs the STT and bot interaction.
         :return:
         """
-
         self.produce_event(STTEvent(["RECORD_INFER_SPEECH"], 1))
 
         logger.debug("STT event produced, recording and inferring speech.")
@@ -92,7 +88,7 @@ class ConversationEngine(EventActor):
         :return:
         """
         # Check if the string is empty or contains only whitespace
-        if self.inference_output.strip() == "":
+        if event_data.strip() == "":
             self.current_index = 0
             logger.debug("The inference output is empty, resetting action list index.")
         else:
@@ -101,25 +97,20 @@ class ConversationEngine(EventActor):
 
         return True
 
-    def command_checker(self, event_type=None, event_data=None):
+    def set_bot_response(self, event_type=None, event_data=None):
         """
-        This function checks for commands.
+        This function sets the bot response.
+        :param event_type:
+        :param event_data:
         :return:
         """
-        if self.inference_output == "SHUTDOWN":
-            self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
-            self.produce_event(HardwareEvent(["SHUTDOWN"], 1))
-            logger.debug("Command checker finished, event output: SHUTDOWN")
-        elif self.inference_output == "SHUT DOWN":
-            self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
-            self.produce_event(HardwareEvent(["SHUTDOWN"], 1))
-            logger.debug("Command checker finished, event output: SHUTDOWN")
-        elif self.inference_output == "REBOOT":
-            self.produce_event(TTSEvent(["GENERATE_TTS", reboot_text], 1))
-            self.produce_event(HardwareEvent(["REBOOT"], 1))
-            logger.debug("Command checker finished, event output: REBOOT")
+        # Check if the string is empty or contains only whitespace
+        if event_data.strip() == "":
+            self.current_index = 0
+            logger.debug("The bot response is empty, resetting action list index.")
         else:
-            logger.debug("Command checker finished, no commands detected")
+            self.bot_response = event_data
+            logger.debug(f"Retrieved bot response and set output response to: {self.bot_response}")
 
         return True
 
@@ -128,9 +119,8 @@ class ConversationEngine(EventActor):
         This function returns the bot response.
         :return:
         """
-        self.bot_response = self.ChatGPT_handler.get_response(self.inference_output)
-
-        logger.debug(f"Bot response: {self.bot_response}")
+        self.produce_event(BotEvent(["GET_BOT_RESPONSE", self.inference_output], 1))
+        logger.debug(f"Bot event produced with input: {self.inference_output}")
 
         return True
 
@@ -144,6 +134,86 @@ class ConversationEngine(EventActor):
 
         return True
 
+    def command_checker(self, event_type=None, event_data=None):
+        """
+        This function returns the bot response.
+        :return:
+        """
+        self.produce_event(CommandCheckEvent(["CHECK_VOICE_COMMANDS", self.inference_output], 1))
+        logger.debug(f"Command check event produced with input: {self.inference_output}")
+
+        return True
+
+    def activate_command_system(self, event_type=None, event_data=None):
+        """
+        This function activates the command conversation system by setting the action list to loop and execute commands.
+        :return:
+        """
+        self.stored_bot_response = self.bot_response
+        self.reset_action_list()
+        self.bot_response = override_text
+        self.functions_list = command_function_list
+
+        logger.debug(f"Command system online, with response: {self.bot_response} and functions list: "
+                     f"{self.functions_list}")
+
+        return True
+
+    def de_activate_command_system(self, event_type=None, event_data=None):
+        """
+        This function activates the command conversation system by setting the action list to loop and execute commands.
+        :return:
+        """
+        self.reset_action_list()
+        self.bot_response = self.stored_bot_response
+        self.functions_list = conversation_function_list
+
+        logger.debug(f"Command system offline, with response: {self.bot_response} and "
+                     f"functions list: {self.functions_list}")
+
+        return True
+
+    def set_command(self, event_type=None, event_data=None):
+        """
+        This function sets the command to run.
+        :return:
+        """
+        self.run_command = event_data
+        self.bot_response = f"Executing command: {event_data}"
+        logger.debug(f"Command set to: {self.run_command}")
+
+        return True
+
+    def execute_command(self, event_type=None, event_data=None):
+        """
+        This function executes the command set previously.
+        :param event_type:
+        :param event_data:
+        :return:
+        """
+        if self.run_command == "shutdown_command":
+            self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
+            self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
+            logger.debug("Command checker finished, event output: SHUTDOWN")
+        elif self.run_command == "reboot_command":
+            self.produce_event(TTSEvent(["GENERATE_TTS", reboot_text], 1))
+            self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
+            logger.debug("Command checker finished, event output: REBOOT")
+        elif self.run_command == "test_command":
+            self.produce_event(TTSEvent(["GENERATE_TTS", test_command_text], 1))
+            self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
+            logger.debug("Command checker finished, event output: TEST COMMAND")
+        elif self.run_command == "no_command":
+            self.bot_response = no_command_text
+            logger.debug("No command to run.")
+        else:
+            self.bot_response = no_command_text
+            logger.debug("No command to run.")
+
+        self.next_action()
+
+        return True
+
     def reset_action_list(self, event_type=None, event_data=None):
         """
         This function returns the bot response.
@@ -153,9 +223,7 @@ class ConversationEngine(EventActor):
         self.functions_list = []
         self.current_index = 0
 
-        logger.debug("All functions have been executed, action list and index reset.")
-
-        return True
+        logger.debug(f"All functions have been executed, action list and index reset to {self.current_index}")
 
     def conversation_cycle(self, event_type=None, event_data=None):
         """
@@ -164,20 +232,10 @@ class ConversationEngine(EventActor):
         """
 
         if self.demo_mode:
-            self.functions_list = [
-                'generate_tts_bot_response',
-                'activate_jaw_audio',
-                'scan_mode_on',
-            ]
+            self.functions_list = demo_mode_function_list
             self.bot_response = demo_text
         else:
-            self.functions_list = [
-                'generate_tts_bot_response',
-                'activate_jaw_audio',
-                'listen_stt',
-                'get_bot_engine_response',
-                'scan_mode_on',
-            ]
+            self.functions_list = conversation_function_list
 
         logger.debug(f"Conversation activated, demo mode: {self.demo_mode} "
                      f"with response: {self.bot_response} and functions list: {self.functions_list}")
@@ -196,7 +254,8 @@ class ConversationEngine(EventActor):
         :param event_data:
         :return:
         """
-        logger.debug(f"Next action called, with functions list: {self.functions_list}")
+        logger.debug(f"Next action called, with functions list: {self.functions_list}, current index: "
+                     f"{self.current_index}")
         if self.functions_list:  # This checks if the list is not empty
             if self.current_index < len(self.functions_list):
                 func_name = self.functions_list[self.current_index]
@@ -209,14 +268,13 @@ class ConversationEngine(EventActor):
 
                 return True
             else:
-                self.functions_list = []
-                self.current_index = 0
-
-                logger.debug("All functions have been executed, action list and index reset.")
+                self.reset_action_list()
 
                 return True
         else:
             logger.debug("No functions to execute.")
+
+            return True
             # Optionally, you can add additional logic here if needed when the list is empty.
 
     def get_event_handlers(self):
@@ -228,6 +286,10 @@ class ConversationEngine(EventActor):
             "HUMAN_DETECTED": self.conversation_cycle,
             "CONVERSATION_ACTION_FINISHED": self.next_action,
             "STT_FINISHED": self.set_inference_output,
+            "BOT_FINISHED": self.set_bot_response,
+            "OVERRIDE_COMMAND_FOUND": self.activate_command_system,
+            "DE_OVERRIDE_COMMAND_FOUND": self.de_activate_command_system,
+            "COMMAND_FOUND": self.set_command,
         }
 
     def get_consumable_events(self):
@@ -235,4 +297,4 @@ class ConversationEngine(EventActor):
         This method returns a list of event types that this consumer can consume.
         :return:
         """
-        return [DetectEvent, ConversationDoneEvent, STTDoneEvent]
+        return [DetectEvent, ConversationDoneEvent, STTDoneEvent, BotDoneEvent, CommandCheckDoneEvent]
