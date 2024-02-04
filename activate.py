@@ -16,6 +16,7 @@ from components.tts_system import TTSOperations
 from components.stt_system import STTOperations
 from components.chatbot_system import ChatbotOperations
 from components.command_system import CommandCheckOperations
+from components.pi_operations_system import PiOperations
 
 BOOT_SPLIT_WAIT = 5
 
@@ -53,6 +54,7 @@ def main():
         AudioJawSync(event_queue, test_mode=test_mode),
         ChatbotOperations(event_queue, test_mode=test_mode),
         CommandCheckOperations(event_queue, test_mode=test_mode),
+        PiOperations(event_queue, test_mode=test_mode),
         ConversationEngine(event_queue, demo_mode=demo_mode),
     ]
 
