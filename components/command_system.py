@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from time import sleep
 
 from EventHive.event_hive_runner import EventActor
-from config.command_config import override_word
+from config.command_config import override_word, de_override_word
 from config.custom_events import CommandCheckEvent, CommandCheckDoneEvent, ConversationDoneEvent
 
 logger = logging.getLogger(__name__)
@@ -24,14 +24,16 @@ class RealCommandOperations(CommandOperationsInterface):
 
     def process_command(self, event_data):
         if event_data == override_word:
-            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "override_command"], 1))
-        elif event_data in ["SHUTDOWN", "SHUT DOWN"]:
+            self.event_producer(CommandCheckDoneEvent(["OVERRIDE_COMMAND_FOUND"], 1))
+        elif event_data == de_override_word:
+            self.event_producer(CommandCheckDoneEvent(["DE_OVERRIDE_COMMAND_FOUND"], 1))
+        elif event_data in ["SHUTDOWN", "SHUT DOWN", "shutdown", "shut down", "power off", "poweroff", "turn off"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "shutdown_command"], 1))
             logger.debug("Command checker finished, event output: SHUTDOWN")
-        elif event_data == "REBOOT":
+        elif event_data in ["REBOOT", "restart", "reboot", "restart now", "reboot now"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "reboot_command"], 1))
             logger.debug("Command checker finished, event output: REBOOT")
-        elif event_data == "TEST COMMAND":
+        elif event_data in ["TEST", "test", "test command"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "test_command"], 1))
             logger.debug("Command checker finished, event output: TEST COMMAND")
         else:
@@ -52,8 +54,11 @@ class TestCommandOperations(CommandOperationsInterface):
 class CommandCheckOperations(EventActor):
     def __init__(self, event_queue, test_mode=True):
         super().__init__(event_queue)
-        self.command_processor = TestCommandOperations(self.produce_event) if test_mode \
-            else RealCommandOperations(self.produce_event)
+        # self.command_processor = TestCommandOperations(self.produce_event) if test_mode \
+        #     else RealCommandOperations(self.produce_event)
+        # todo: leaving the test strategy in place for now but not using it, as we need commands to go through
+        #  while testing; may need in future though
+        self.command_processor = RealCommandOperations(self.produce_event)
 
     def check_and_process_commands(self, event_type=None, event_data=None):
         self.command_processor.process_command(event_data)
@@ -62,7 +67,9 @@ class CommandCheckOperations(EventActor):
         return True
 
     def get_event_handlers(self):
-        return {"CHECK_VOICE_COMMANDS": self.check_and_process_commands}
+        return {
+            "CHECK_VOICE_COMMANDS": self.check_and_process_commands
+        }
 
     def get_consumable_events(self):
         return [CommandCheckEvent]
