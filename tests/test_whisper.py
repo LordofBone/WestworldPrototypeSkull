@@ -37,7 +37,7 @@ class TestWhisperSTT(unittest.TestCase):
 
     def test_real_hardware_stt(self):
         # Initialize STT handler
-        self.SpeechtoText = SpeechtoTextHandler(microphone_name=loopback_name)
+        self.SpeechtoText = SpeechtoTextHandler(stt_microphone_name=loopback_name)
         self.SpeechtoText.model_size = "tiny"
 
         # Create threads
