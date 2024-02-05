@@ -1,6 +1,7 @@
 # Virtual Loopback Device Setup on Raspberry Pi
 
-This guide will walk you through the process of setting up a virtual loopback device on a Raspberry Pi. This allows you to record audio coming from the speakers while also playing the sound.
+This guide will walk you through the process of setting up a virtual loopback device on a Raspberry Pi. This allows you
+to record audio coming from the speakers while also playing the sound.
 
 ## Prerequisites
 
@@ -9,7 +10,8 @@ This guide will walk you through the process of setting up a virtual loopback de
 
 ## Hardware/Code setup
 
-Full build instructions/parts list can be found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9)
+Full build instructions/parts list can be
+found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9)
 
 Software runs on RPi OS Bullseye (64-bit)
 
@@ -35,7 +37,7 @@ You can install the dependencies in a virtual environment:
 
 ```sudo pip install -r requirements.txt```
 
-(Needs to be run as sudo as the Inventor HAT Mini library requires it below) 
+(Needs to be run as sudo as the Inventor HAT Mini library requires it below)
 
 ### Installing the Inventor Hat Mini library
 
@@ -147,7 +149,7 @@ pcm.loopout {
 ```
 
 Or can copy and paste the asound.conf file in this repo:
-    
+
 ```sudo cp setup/asound.conf /etc/```
 
 ### 3. Move the Configuration File
@@ -205,7 +207,8 @@ Copy setup/rc.local to /etc/rc.local
 
 And change the <USERHOME> to the user home where the code was cloned to.
 
-This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for some reason).
+This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for
+some reason).
 
 ## Local Whisper model setup
 
@@ -217,22 +220,27 @@ To download the models required for running Whisper locally, run the following s
 
 ### Configuring Lakul (Speech Recognition with Whisper)
 
-You need to copy the file `Lakul/config/whisper_config_template.py` into a file called `Lakul/config/whisper_config.py` and 
-add your own API key from [OpenAI](https://platform.openai.com/); if you wish to use the online version (will be considerably
+You need to copy the file `Lakul/config/whisper_config_template.py` into a file called `Lakul/config/whisper_config.py`
+and
+add your own API key from [OpenAI](https://platform.openai.com/); if you wish to use the online version (will be
+considerably
 faster on a RPi 4 than the offline version, but of course will cost you money per inference).
 
-You can then switch between local and online versions by changing the `offline_mode` variable in `Lakul/config/whisper_config.py`.
+You can then switch between local and online versions by changing the `offline_mode` variable
+in `Lakul/config/whisper_config.py`.
 
 ### Configuring the TTS (Text to Speech)
 
 Under config/tts_config.py you can change the voice and speed of the TTS.
 
-In order to use fakeyou you will need to set up an account [here](https://fakeyou.com/), copy config/fakeyou_config_template.py 
+In order to use fakeyou you will need to set up an account [here](https://fakeyou.com/), copy
+config/fakeyou_config_template.py
 to config/fakeyou_config.py and add your login details and voice ID for the voice you want.
 
 ### Configuring ChattingGPT (Chatting with GPT-3)
 
-Copy or rename 'ChattingGPT/config/api_config_template.py' to 'ChattingGPT/config/api_config.py' and add your own API key
+Copy or rename 'ChattingGPT/config/api_config_template.py' to 'ChattingGPT/config/api_config.py' and add your own API
+key
 from [OpenAI](https://platform.openai.com/)
 
 ## Running the code
@@ -247,7 +255,8 @@ For running the full system, run the following command:
 
 ## Running tests
 
-If you want to make some changes and need to test things are still working, or need to test the hardware has been set up correctly, then you can run the tests individually:
+If you want to make some changes and need to test things are still working, or need to test the hardware has been set up
+correctly, then you can run the tests individually:
 
 ```sudo python tests/test_audio_jaw.py```
 
