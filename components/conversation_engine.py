@@ -6,8 +6,7 @@ from config.custom_events import (STTEvent, TTSEvent, BotEvent, MovementEvent, D
                                   ConversationDoneEvent, AudioDetectControllerEvent, CommandCheckEvent,
                                   CommandCheckDoneEvent, HardwareEvent)
 from config.path_config import tts_audio_path
-from config.tts_config import (demo_text, greeting_text, override_text, test_command_text, no_command_text,
-                               shutdown_text, reboot_text)
+from config.tts_config import demo_text, greeting_text, override_text
 
 logger = logging.getLogger(__name__)
 
@@ -178,8 +177,8 @@ class ConversationEngine(EventActor):
         This function sets the command to run.
         :return:
         """
-        self.run_command = event_data
-        self.bot_response = f"Executing command: {event_data}"
+        self.run_command = event_data[0]
+        self.bot_response = event_data[1]
         logger.debug(f"Command set to: {self.run_command}")
 
         return True
@@ -192,25 +191,20 @@ class ConversationEngine(EventActor):
         :return:
         """
         if self.run_command == "shutdown_command":
-            self.produce_event(TTSEvent(["GENERATE_TTS", shutdown_text], 1))
             self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
             logger.debug("Command checker finished, event output: SHUTDOWN")
         elif self.run_command == "reboot_command":
-            self.produce_event(TTSEvent(["GENERATE_TTS", reboot_text], 1))
             self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
             logger.debug("Command checker finished, event output: REBOOT")
         elif self.run_command == "test_command":
-            self.produce_event(TTSEvent(["GENERATE_TTS", test_command_text], 1))
             self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
             logger.debug("Command checker finished, event output: TEST COMMAND")
         elif self.run_command == "no_command":
-            self.bot_response = no_command_text
             logger.debug("No command to run.")
+            self.next_action()
         else:
-            self.bot_response = no_command_text
             logger.debug("No command to run.")
-
-        self.next_action()
+            self.next_action()
 
         return True
 

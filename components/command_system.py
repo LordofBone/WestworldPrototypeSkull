@@ -5,6 +5,7 @@ from time import sleep
 from EventHive.event_hive_runner import EventActor
 from config.command_config import override_word, de_override_word
 from config.custom_events import CommandCheckEvent, CommandCheckDoneEvent, ConversationDoneEvent
+from config.tts_config import test_command_text, shutdown_text, reboot_text, no_command_text
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -28,16 +29,16 @@ class RealCommandOperations(CommandOperationsInterface):
         elif event_data == de_override_word:
             self.event_producer(CommandCheckDoneEvent(["DE_OVERRIDE_COMMAND_FOUND"], 1))
         elif event_data in ["SHUTDOWN", "SHUT DOWN", "shutdown", "shut down", "power off", "poweroff", "turn off"]:
-            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "shutdown_command"], 1))
+            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["shutdown_command", shutdown_text]], 1))
             logger.debug("Command checker finished, event output: SHUTDOWN")
         elif event_data in ["REBOOT", "restart", "reboot", "restart now", "reboot now"]:
-            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "reboot_command"], 1))
+            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["reboot_command", reboot_text]], 1))
             logger.debug("Command checker finished, event output: REBOOT")
         elif event_data in ["TEST", "test", "test command"]:
-            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "test_command"], 1))
+            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["test_command", test_command_text]], 1))
             logger.debug("Command checker finished, event output: TEST COMMAND")
         else:
-            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", "no_command"], 1))
+            self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["no_command", no_command_text]], 1))
             logger.debug("Command checker finished, no commands detected")
 
 
