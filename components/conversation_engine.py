@@ -200,7 +200,7 @@ class ConversationEngine(EventActor):
             self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
             logger.debug("Command checker finished, event output: SHUTDOWN")
         elif self.run_command == "reboot_command":
-            self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
+            self.produce_event(HardwareEvent(["REBOOT"], 3))
             logger.debug("Command checker finished, event output: REBOOT")
         elif self.run_command == "test_command":
             self.produce_event(HardwareEvent(["SHUTDOWN"], 3))
