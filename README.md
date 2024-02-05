@@ -13,6 +13,16 @@ Full build instructions/parts list can be found [here](https://www.hackster.io/3
 
 Software runs on RPi OS Bullseye (64-bit)
 
+### Cloning the repository
+
+Navigate to your home directory and clone the repository:
+
+```cd ~```
+
+```git clone --recursive https://github.com/LordofBone/WestworldPrototypeSkull.git```
+
+```cd WestworldPrototypeSkull```
+
 ## Installing dependencies
 
 You can install the dependencies in a virtual environment:
@@ -192,6 +202,8 @@ to the speakers:
 Copy setup/rc.local to /etc/rc.local
 
 ```sudo cp setup/rc.local /etc/rc.local```
+
+And change the <USERHOME> to the user home where the code was cloned to.
 
 This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for some reason).
 
