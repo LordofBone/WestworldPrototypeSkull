@@ -237,11 +237,30 @@ In order to use fakeyou you will need to set up an account [here](https://fakeyo
 config/fakeyou_config_template.py
 to config/fakeyou_config.py and add your login details and voice ID for the voice you want.
 
-### Configuring ChattingGPT (Chatting with GPT-3)
+### Configuring ChattingGPT (Chatting with either ChatGPT or Ollama local LLM)
 
 Copy or rename 'ChattingGPT/config/api_config_template.py' to 'ChattingGPT/config/api_config.py' and add your own API
 key
 from [OpenAI](https://platform.openai.com/)
+
+Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
+
+Or if you just want to run a local LLM chatbot, then you can use Ollama by setting the `chat_backend` variable to 
+'ollama' and ensuring the above Ollama setup has been completed.
+
+There is a `role` variable that enables you to set the role of the chatbot to get different responses. Currently 
+defaults to a newly made Westworld host prototype.
+
+You can also adjust the use_history variable to enable a more conversational chatbot for either GPT or Ollama.
+
+If you want to use a different model you can change the `ollama_model` variable, currently defaults to
+"westworld-prototype", if you do want to use a different model, you will need to download it with Ollama, for example:
+
+```ollama pull llama2```
+
+Then setting:
+    
+```ollama_model = "llama2"```
 
 ## Running the code
 
