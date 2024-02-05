@@ -29,9 +29,7 @@ You can install the dependencies in a virtual environment:
 
 ### Installing the Inventor Hat Mini library
 
-```https://github.com/pimoroni/inventorhatmini-python#getting-the-library```
-
-More info [here](https://github.com/pimoroni/inventorhatmini-python)
+Library installation info [here](https://github.com/pimoroni/inventorhatmini-python#getting-the-library)
 
 Be sure to follow the audio setup instructions below as well.
 
@@ -58,6 +56,14 @@ It's also a good idea to use alsamixer to adjust the volume of the microphone:
 Hit F4 to go to the capture screen.
 
 Find the USB PnP Sound Device and adjust to volume to around 30% and then hit ESC to exit.
+
+### Installing Ollama (for local LLM chatbot)
+
+Guide for installing Ollama on Linux [here](https://ollama.ai/download/linux)
+
+Then to download the LLM and configure it, run:
+
+```./setup/build_llm.sh```
 
 ### Installing e-speak (for TTS)
 
