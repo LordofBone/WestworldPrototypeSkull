@@ -26,6 +26,7 @@ class ConversationEngine(EventActor):
 
         self.inference_output = None
 
+        self.command_mode = False
         self.run_command = None
 
         self.bot_response = greeting_text
@@ -148,6 +149,7 @@ class ConversationEngine(EventActor):
         This function activates the command conversation system by setting the action list to loop and execute commands.
         :return:
         """
+        self.command_mode = True
         self.stored_bot_response = self.bot_response
         self.reset_action_list()
         self.bot_response = override_text
@@ -163,6 +165,7 @@ class ConversationEngine(EventActor):
         This function activates the command conversation system by setting the action list to loop and execute commands.
         :return:
         """
+        self.command_mode = False
         self.reset_action_list()
         self.bot_response = self.stored_bot_response
         self.functions_list = conversation_function_list
@@ -177,9 +180,12 @@ class ConversationEngine(EventActor):
         This function sets the command to run.
         :return:
         """
-        self.run_command = event_data[0]
-        self.bot_response = event_data[1]
-        logger.debug(f"Command set to: {self.run_command}")
+        if self.command_mode:
+            self.run_command = event_data[0]
+            self.bot_response = event_data[1]
+            logger.debug(f"Command mode on, command set to: {self.run_command}")
+        else:
+            logger.debug("Command mode off, no command set.")
 
         return True
 
