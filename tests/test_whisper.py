@@ -21,6 +21,11 @@ class TestWhisperSTT(unittest.TestCase):
         audio_engine_access().audio_file = whisper_test_audio_path
         self.transcription_queue = queue.Queue()
 
+        # Initialize STT handler with loopback
+        self.SpeechtoText = SpeechtoTextHandler(stt_microphone_name=loopback_name, init_on_launch=False)
+        self.SpeechtoText.model_size = "tiny"
+        self.SpeechtoText.init_models()
+
     def play_audio(self):
         # Set and play audio file from location
         audio_engine_access().play_audio()
@@ -35,11 +40,7 @@ class TestWhisperSTT(unittest.TestCase):
         self.transcription_queue.put(transcription)
 
     def test_real_hardware_stt(self):
-        # Initialize STT handler
-        self.SpeechtoText = SpeechtoTextHandler(stt_microphone_name=loopback_name)
-        self.SpeechtoText.model_size = "tiny"
-
-        # Create threads
+        # Create threads for audio and transcription
         audio_thread = threading.Thread(target=self.play_audio)
 
         transcription_thread = threading.Thread(target=self.record_and_transcribe)
