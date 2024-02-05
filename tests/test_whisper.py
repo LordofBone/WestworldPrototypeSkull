@@ -1,9 +1,8 @@
-import sys
-import unittest
-
-from pathlib import Path
-import threading
 import queue
+import sys
+import threading
+import unittest
+from pathlib import Path
 
 top_dir = Path(__file__).parent.parent
 

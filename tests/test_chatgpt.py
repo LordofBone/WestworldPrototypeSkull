@@ -7,7 +7,7 @@ sys.path.append(str(top_dir))
 
 import openai
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from ChattingGPT.integrate_chatgpt import IntegrateChatGPT
 
 # Mocked API response for ChatCompletion without history

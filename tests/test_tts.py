@@ -1,6 +1,7 @@
-import unittest
-from unittest.mock import Mock, patch
 import os
+import unittest
+from unittest.mock import Mock
+
 import pyttsx3
 
 
