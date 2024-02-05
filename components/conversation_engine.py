@@ -234,6 +234,8 @@ class ConversationEngine(EventActor):
         if self.demo_mode:
             self.functions_list = demo_mode_function_list
             self.bot_response = demo_text
+        elif self.command_mode:
+            self.functions_list = command_function_list
         else:
             self.functions_list = conversation_function_list
 
