@@ -176,11 +176,16 @@ Reboot the Raspberry Pi:
 
 If there are issues then run the find_loopback.py file:
 
-```python3 find_loopback.py```
+```python find_loopback.py```
 
 And see what the output is. If it is not 1,0 then change the asound.conf file to match the output.
 
 As well as changing the loopback_name variable in config/audio_config.py
+
+You can also run the following code to check the audio quality, this will record via the mic and then output the audio
+to the speakers:
+
+```sudo python mic_quality_check.py```
 
 ## Startup script
 
