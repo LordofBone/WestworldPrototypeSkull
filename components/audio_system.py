@@ -47,7 +47,7 @@ class AudioEngine:
             cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, highest_quality=True):
         if self.__initialized:
             return
         self.__initialized = True
@@ -59,6 +59,10 @@ class AudioEngine:
 
         self.sample_rates = [8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 384000]
         self.chunk_sizes = [128, 256, 512, 1024, 2048]
+
+        if highest_quality:
+            self.sample_rates.reverse()
+            self.chunk_sizes.reverse()
 
         self.input_device = None
 
