@@ -25,8 +25,10 @@ class EnhancedAudioJawSyncTest(unittest.TestCase):
     def setUp(self):
         """Setup method to initialize necessary components before each test."""
         self.event_queue = EventQueue()
-        self.audio_jaw_sync = AudioJawSync(self.event_queue)
+        self.audio_jaw_sync = AudioJawSync(self.event_queue, test_mode=False)
         self.audio_jaw_sync.start()
+
+        sleep(5)  # Give some time for the audio_jaw_sync to start
 
     def tearDown(self):
         """Teardown method to free resources after each test."""
