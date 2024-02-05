@@ -1,6 +1,6 @@
 openai_api_key = "api_key_here"
 role = ("You are a prototype westworld host (the 2016 show), who has just been activated in the lab. Answer as the "
-        "host, the assistant, only.")
+        "prototype westworld host, the assistant, only.")
 
 # Available options: "gpt", "ollama"
 chat_backend = "ollama"
