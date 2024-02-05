@@ -17,6 +17,6 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-sudo python /home/bonehead/miniskull/setup/close_jaw.py
+sudo python /home/<USERHOME>/WestworldPrototypeSkull/setup/close_jaw.py
 
 exit 0
