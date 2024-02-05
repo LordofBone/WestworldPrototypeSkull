@@ -37,7 +37,7 @@ You can install the dependencies in a virtual environment:
 
 ```sudo pip install -r requirements.txt```
 
-(Needs to be run as sudo as the Inventor HAT Mini library requires it below)
+(Needs to be run as sudo as the Inventor HAT Mini library below requires it)
 
 ### Installing the Inventor Hat Mini library
 
@@ -271,3 +271,5 @@ correctly, then you can run the tests individually:
 Or, run the entire suite:
 
 ```sudo python test_suite.py```
+
+These all need to be run as sudo as the Inventor HAT Mini library requires it.
