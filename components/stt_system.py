@@ -9,7 +9,8 @@ from Lakul.integrate_stt import SpeechtoTextHandler
 from config.audio_config import microphone_name
 from config.command_config import override_word, de_override_word
 from config.custom_events import STTEvent, STTDoneEvent, ConversationDoneEvent
-from config.stt_config import profanity_censor_enabled, offline_mode, model_size, stt_audio_path
+from config.stt_config import profanity_censor_enabled, offline_mode, model_size, stt_audio_path, recording_max_seconds, \
+    recording_silence_threshold, recording_silence_duration
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -32,7 +33,8 @@ class RealSTTHandler(STTHandlerInterface):
                                                init_on_launch=False)
         self.STT_handler.init_models()
 
-    def initiate_recording(self, max_seconds=60, silence_threshold=1000, silence_duration=2000):
+    def initiate_recording(self, max_seconds=recording_max_seconds, silence_threshold=recording_silence_threshold,
+                           silence_duration=recording_silence_duration):
         self.STT_handler.initiate_recording(max_seconds, silence_threshold, silence_duration)
 
     def run_inference(self):
