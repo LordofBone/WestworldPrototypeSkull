@@ -1,7 +1,6 @@
-# Virtual Loopback Device Setup on Raspberry Pi
+# Westworld Prototype Skull
 
-This guide will walk you through the process of setting up a virtual loopback device on a Raspberry Pi. This allows you
-to record audio coming from the speakers while also playing the sound.
+This guide will walk you through the process of setting up the Westworld Prototype Skull on a Raspberry Pi.
 
 ## Prerequisites
 
@@ -82,6 +81,9 @@ Then to download the LLM and configure it, run:
 ```sudo apt-get install espeak```
 
 ## Audio setup
+
+This guide will walk you through the process of setting up a virtual loopback device on a Raspberry Pi. This allows you
+to record audio coming from the speakers without having to use the microphone.
 
 ### 1. Load the Loopback Module
 
