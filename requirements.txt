@@ -28,7 +28,7 @@ multidict==6.0.4
 numba==0.57.0
 numpy==1.23.5
 onnxruntime==1.16.1
-openai==0.27.0
+openai==1.11.1
 packaging==21.3
 phonemizer==2.2.1
 platformdirs==3.8.0
