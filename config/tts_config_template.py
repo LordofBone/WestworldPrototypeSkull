@@ -2,10 +2,15 @@ import os
 import sys
 from pathlib import Path
 
-# Options are: pyttsx3/fakeyou/nix
+openai_api_key = "api_key_here"
+
+# Options are: pyttsx3/fakeyou/nix/openai
 tts_mode = "nix"
 
 pyttsx3_voice = 2
+
+# Options are: alloy/echo/fable/onyx/nova/shimmer
+openai_voice = "onyx"
 
 nix_dir = os.path.join(Path(__file__).parent.parent, 'nix-tts')
 audio_dir = Path(__file__).parent.parent / f"audio"
