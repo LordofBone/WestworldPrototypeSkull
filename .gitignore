@@ -10,3 +10,4 @@ models/stochastic/*
 !models/stochastic/.gitkeep
 config/fakeyou_config.py
 config/chattinggpt_config.py
+config/tts_config.py
