@@ -34,7 +34,7 @@ class TestWhisperSTT(unittest.TestCase):
     def record_and_transcribe(self):
         # Record and transcribe
         print("Recording...")
-        self.SpeechtoText.initiate_recording(max_seconds=20, silence_duration=20000)
+        self.SpeechtoText.initiate_recording(max_seconds=20, silence_duration=2, silence_threshold=1000)
         print("Inferencing...")
         transcription = self.SpeechtoText.run_inference()
         self.transcription_queue.put(transcription)
