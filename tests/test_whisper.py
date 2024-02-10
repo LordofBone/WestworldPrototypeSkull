@@ -40,7 +40,9 @@ class TestWhisperSTT(unittest.TestCase):
         self.transcription_queue.put(transcription)
 
     def test_real_hardware_stt(self):
-        # Create threads for audio and transcription
+        # todo: look into making this record the master audio file then play it out again to be analysed by STT? this
+        #  would test STT and mic quality automatically; but had some issues implementing before with no audio being
+        #  recorded, could be a loopback/mic being activated same time issue?
         audio_thread = threading.Thread(target=self.play_audio)
 
         transcription_thread = threading.Thread(target=self.record_and_transcribe)
