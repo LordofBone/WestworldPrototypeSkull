@@ -247,10 +247,10 @@ from [OpenAI](https://platform.openai.com/)
 
 Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
 
-Or if you just want to run a local LLM chatbot, then you can use Ollama by setting the `chat_backend` variable to 
+Or if you just want to run a local LLM chatbot, then you can use Ollama by setting the `chat_backend` variable to
 'ollama' and ensuring the above Ollama setup has been completed.
 
-There is a `role` variable that enables you to set the role of the chatbot to get different responses. Currently 
+There is a `role` variable that enables you to set the role of the chatbot to get different responses. Currently
 defaults to a newly made Westworld host prototype.
 
 You can also adjust the use_history variable to enable a more conversational chatbot for either GPT or Ollama.
@@ -261,7 +261,7 @@ If you want to use a different model you can change the `ollama_model` variable,
 ```ollama pull llama2```
 
 Then setting:
-    
+
 ```ollama_model = "llama2"```
 
 ## Running the code
