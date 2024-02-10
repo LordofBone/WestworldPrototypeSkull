@@ -2,6 +2,9 @@ import os
 import sys
 from pathlib import Path
 
+# Options are: pyttsx3/fakeyou/nix/openai
+tts_mode = "nix"
+
 openai_api_key = "api_key_here"
 
 # Options are tts-1, tts-1-hd
@@ -9,9 +12,6 @@ openai_model = "tts-1"
 
 # Options are: alloy/echo/fable/onyx/nova/shimmer
 openai_voice = "onyx"
-
-# Options are: pyttsx3/fakeyou/nix/openai
-tts_mode = "nix"
 
 pyttsx3_voice = 2
 
