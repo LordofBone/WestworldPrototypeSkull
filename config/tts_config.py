@@ -19,12 +19,13 @@ audio_dir = Path(__file__).parent.parent / f"audio"
 determ_model_path = Path(__file__).parent.parent / f"models/deterministic"
 stoch_model_path = Path(__file__).parent.parent / f"models/stochastic"
 
-boot_text = "Welcome to the Arasaka Relic Cyberware System; Trauma Team Edition"
-boot_text_test = "Welcome to the Arasaka Relic Cyberware System; Trauma Team Edition. Testing mode active."
+boot_text = "Welcome to the Westworld Prototype Host System, awaiting configuration."
+boot_text_test = "Welcome to the Westworld Prototype Host System. Testing mode active."
 
 reboot_text = "Rebooting the system, please wait."
 shutdown_text = "Shutting down the system, please wait."
-demo_text = "Hello, my name is Skull. I am a conversational AI. I am a demo version of the full Skull AI."
+demo_text = ("Hello, I am a Westworld Prototype Host. This is a demo of my conversational abilities. I am a prototype "
+             "host, awaiting configuration.")
 greeting_text = "Hello"
 override_text = "Override command detected. Activating command system."
 test_text = "Test command detected. Command system working."
