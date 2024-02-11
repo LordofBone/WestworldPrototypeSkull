@@ -9,8 +9,8 @@ from Lakul.integrate_stt import SpeechtoTextHandler
 from config.audio_config import microphone_name
 from config.command_config import override_word, de_override_word
 from config.custom_events import STTEvent, STTDoneEvent, ConversationDoneEvent
-from config.stt_config import profanity_censor_enabled, offline_mode, model_size, stt_audio_path, recording_max_seconds, \
-    recording_silence_threshold, recording_silence_duration
+from config.stt_config import (profanity_censor_enabled, offline_mode, model_size, stt_audio_path,
+                               recording_max_seconds, recording_silence_threshold, recording_silence_duration)
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
