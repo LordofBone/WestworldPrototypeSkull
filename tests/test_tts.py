@@ -1,63 +1,49 @@
 import os
+import sys
 import unittest
-from unittest.mock import Mock
+from pathlib import Path
 
-import pyttsx3
+from playsound import playsound
 
+top_dir = Path(__file__).parent.parent
 
-# Here, you should import the necessary classes and configurations from tts_system.py
-# I'm just going to use the mocked version of TTSOperationsPyTTSx3 for demonstration.
-
-class MockedTTSOperationsPyTTSx3:
-    def __init__(self, audio_dir, file_name):
-        self.engine = Mock()  # Mocking the pyttsx3 engine
-        self.voices = [Mock(), Mock()]
-        self.engine.getProperty.return_value = self.voices
-        self.filename = f'{audio_dir}/{file_name}'
-
-    def generate_tts(self, text_input):
-        self.engine.save_to_file(text_input, self.filename)
-        self.engine.runAndWait()
+sys.path.append(str(top_dir))
+from components.tts_system import TTSOperationsNix, TTSOperationsOpenAI, TTSOperationsPyTTSx3, TTSOperationsFakeYou
 
 
-class TestMockedTTSOperationsPyTTSx3(unittest.TestCase):
+class TestTTSSystems(unittest.TestCase):
+    base_text = "This is a test of the {system_name} Text-to-Speech system."
 
-    def setUp(self):
-        # Mock configurations
-        self.mock_audio_dir = "/tmp"  # Using a temp directory for testing purposes
-        self.mock_file_name = "test_audio.wav"
+    @classmethod
+    def setUpClass(cls):
+        # List of TTS operation instances to test
+        cls.tts_operations = [
+            TTSOperationsPyTTSx3(),  # this can be buggy and not save to file, need to find out why
+            TTSOperationsNix(),
+            # TTSOperationsOpenAI(),  # commented out to prevent accidental use of the OpenAI TTS system
+            # TTSOperationsFakeYou(),  # commented out to prevent accidental use of the fakeyou TTS system
+        ]
 
-    def test_generate_tts(self):
-        tts_op = MockedTTSOperationsPyTTSx3(self.mock_audio_dir, self.mock_file_name)
-        tts_op.generate_tts("Test message")
+    def test_tts_operations(self):
+        loop = 0
+        for tts_op in self.tts_operations:
+            loop += 1  # Increment loop counter
+            class_name = tts_op.__class__.__name__
+            # Use string formatting to include both the class name and the loop counter
+            test_text = f"{self.base_text.format(system_name=class_name)} Loop: {loop}"
 
-        # Check if the file has been saved at the expected location
-        expected_file_path = os.path.join(self.mock_audio_dir, self.mock_file_name)
-        tts_op.engine.save_to_file.assert_called_with("Test message", expected_file_path)
-        tts_op.engine.runAndWait.assert_called_once()
+            print(f"Testing TTS system: {class_name}")
 
+            # Generate TTS
+            tts_op.generate_tts(test_text)
 
-def play_tts_message(message):
-    """Play a TTS message to the user using pyttsx3."""
-    engine = pyttsx3.init()
-    engine.say(message)
-    engine.runAndWait()
+            # Check if the file exists
+            filename = tts_op.filename
+            self.assertTrue(os.path.exists(filename), f"Failed to generate TTS file for {class_name}")
 
-
-def main():
-    # Play start and end messages to inform the user
-    play_tts_message("Starting TTS system tests. Please listen carefully.")
-
-    # Run the test
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestMockedTTSOperationsPyTTSx3)
-    result = unittest.TextTestRunner().run(suite)
-
-    # Inform user about the result
-    if result.wasSuccessful():
-        play_tts_message("TTS system tests completed successfully!")
-    else:
-        play_tts_message("TTS system tests encountered errors. Please check the logs.")
+            # Optionally, play the sound file here if needed
+            playsound(filename)
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    unittest.main()
