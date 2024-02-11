@@ -41,6 +41,7 @@ class TestWhisperSTT(unittest.TestCase):
     def record_and_transcribe(self):
         # Record and transcribe
         print(f"Recording with {self.stt_runner.custom_name}...")
+        # configured with the silence duration to be 20 seconds, as sometimes the audio will take a while to play
         self.stt_runner.initiate_recording(max_seconds=20, silence_duration=20, silence_threshold=1000)
         print(f"Finished recording with {self.stt_runner.custom_name}...")
         print(f"Inferencing with {self.stt_runner.custom_name}...")
