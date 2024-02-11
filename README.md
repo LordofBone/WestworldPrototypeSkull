@@ -233,6 +233,9 @@ Copy or rename 'config/open_ai_config_template.py' to 'config/open_ai_config.py'
 key under `open_ai_api_key` to set the key for all the OpenAI API requests; TTS, STT and ChatGPT.
 from [OpenAI](https://platform.openai.com/)
 
+Here is a guide on how to get an API key from OpenAI: 
+[OpenAI API Key Guide](https://www.howtogeek.com/885918/how-to-get-an-openai-api-key/)
+
 Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
 
 ### Configuring Lakul (Speech Recognition with Whisper)
