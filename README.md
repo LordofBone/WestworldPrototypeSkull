@@ -38,6 +38,10 @@ You can install the dependencies in a virtual environment:
 
 (Needs to be run as sudo as the Inventor HAT Mini library below requires it)
 
+For the local Whisper STT installation:
+
+`pip install git+https://github.com/openai/whisper.git`
+
 ### Installing the Inventor Hat Mini library
 
 Library installation info [here](https://github.com/pimoroni/inventorhatmini-python#getting-the-library)
@@ -220,16 +224,18 @@ To download the models required for running Whisper locally, run the following s
 
 ## Configuring the system
 
+### Setting the OpenAI API key
+
+Copy or rename 'config/open_ai_config_template.py' to 'config/open_ai_config.py' and add your own API
+key under `open_ai_api_key` to set the key for all the OpenAI API requests; TTS, STT and ChatGPT.
+from [OpenAI](https://platform.openai.com/)
+
+Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
+
 ### Configuring Lakul (Speech Recognition with Whisper)
 
-You need to copy the file `Lakul/config/whisper_config_template.py` into a file called `Lakul/config/whisper_config.py`
-and
-add your own API key from [OpenAI](https://platform.openai.com/); if you wish to use the online version (will be
-considerably
-faster on a RPi 4 than the offline version, but of course will cost you money per inference).
-
-You can then switch between local and online versions by changing the `offline_mode` variable
-in `Lakul/config/whisper_config.py`.
+You can set the variable `offline_mode` under config/stt_config to False if you wish to use the OpenAI API version 
+(will be considerably faster than the offline version, but of course will cost you money per inference).
 
 ### Configuring the TTS (Text to Speech)
 
@@ -239,21 +245,33 @@ In order to use fakeyou you will need to set up an account [here](https://fakeyo
 config/fakeyou_config_template.py
 to config/fakeyou_config.py and add your login details and voice ID for the voice you want.
 
+You can switch between the different TTS engines by changing the `tts_mode` variable to either pyttsx3, fakeyou, nix
+or openai.
+
 ### Configuring ChattingGPT (Chatting with either ChatGPT or Ollama local LLM)
 
-Copy or rename 'ChattingGPT/config/api_config_template.py' to 'ChattingGPT/config/api_config.py' and add your own API
-key
-from [OpenAI](https://platform.openai.com/)
+You can set the `chat_backend` variable to either `gpt` or `ollama` to switch between using the OpenAI ChatGPT API
+or run the local Ollama LLM.
 
-Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
-
-Or if you just want to run a local LLM chatbot, then you can use Ollama by setting the `chat_backend` variable to
+If you just want to run a local LLM chatbot, then you can use Ollama by setting the `chat_backend` variable to
 'ollama' and ensuring the above Ollama setup has been completed.
 
 There is a `role` variable that enables you to set the role of the chatbot to get different responses. Currently
 defaults to a newly made Westworld host prototype.
 
-You can also adjust the use_history variable to enable a more conversational chatbot for either GPT or Ollama.
+You can also adjust the `use_history` variable to enable a more conversational chatbot for either GPT or Ollama.
+
+You can set up the chatbot by going to the `setup` folder and running:
+
+```sudo chmod +x build_llm.sh```
+
+```./build_llm.sh```
+
+This will build the model `westworld-prototype` with the configuration from the Modelfile.
+
+You can also modify the Modelfile to change parameters such as the role and the length of responses (this is currently
+set to 8 tokens so that it doesn't take too long on a RPi Zero 2W, but you can increase this if you have a more powerful
+device).
 
 If you want to use a different model you can change the `ollama_model` variable, currently defaults to
 "westworld-prototype", if you do want to use a different model, you will need to download it with Ollama, for example:
