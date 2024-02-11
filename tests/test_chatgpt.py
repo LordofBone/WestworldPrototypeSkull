@@ -1,66 +1,62 @@
 import sys
+import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 top_dir = Path(__file__).parent.parent
 
 sys.path.append(str(top_dir))
 
-import openai
-import unittest
-from unittest.mock import patch
-from ChattingGPT.integrate_chatgpt import IntegrateChatGPT
-
-# Mocked API response for ChatCompletion without history
-mock_response_without_history = {
-    'choices': [{
-        'message': {
-            'content': 'Hello! How can I help you today?'
-        }
-    }]
-}
-
-# Mocked API response for ChatCompletion with history
-mock_response_with_history = {
-    'choices': [{
-        'message': {
-            'content': 'I am just a model, but I am functioning well. Thanks for asking!'
-        }
-    }]
-}
+from components.chatbot_system import IntegrateChatGPT, IntegrateOllama
 
 
-class TestIntegrateChatGPT(unittest.TestCase):
+class TestChatGPTIntegration(unittest.TestCase):
+    @patch('ChattingGPT.components.chatgpt_functions.ChatGPTSystem._get_chatgpt_response')
+    def test_chatgpt_without_history(self, mock_get_response):
+        # Mock the response from ChatGPT when not using history
+        mock_get_response.return_value = "Mocked ChatGPT Response Without History"
 
-    @patch("openai.ChatCompletion.create", return_value=mock_response_without_history)
-    def test_response_without_history(self, mock_create):
-        chat_gpt = IntegrateChatGPT(role="you are a helpful assistant", use_history=False)
-        response = chat_gpt.get_response("hello there")
-        self.assertEqual(response, 'Hello! How can I help you today?')
+        chat_system = IntegrateChatGPT(use_history=False)
+        response = chat_system.get_response("Test Input")
 
-    @patch("openai.ChatCompletion.create", side_effect=[mock_response_without_history, mock_response_with_history])
-    def test_response_with_history(self, mock_create):
-        chat_gpt = IntegrateChatGPT(role="you are a helpful assistant", use_history=True)
-        response_1 = chat_gpt.get_response("hello there")
-        self.assertEqual(response_1, 'Hello! How can I help you today?')
+        self.assertEqual(response, "Mocked ChatGPT Response Without History")
+        mock_get_response.assert_called_once()
 
-        response_2 = chat_gpt.get_response("how are you today?")
-        self.assertEqual(response_2, 'I am just a model, but I am functioning well. Thanks for asking!')
+    @patch('ChattingGPT.components.chatgpt_functions.ChatGPTSystem._get_chatgpt_response_with_history')
+    def test_chatgpt_with_history(self, mock_get_response):
+        # Mock the response from ChatGPT when using history
+        mock_get_response.return_value = "Mocked ChatGPT Response With History"
 
-    def test_initialization(self):
-        chat_gpt = IntegrateChatGPT(role="you are a helpful assistant", use_history=True)
-        self.assertEqual(chat_gpt.context, "you are a helpful assistant")
-        self.assertTrue(chat_gpt.use_history)
-        self.assertEqual(chat_gpt.conversation_history[0]['role'], 'system')
-        self.assertEqual(chat_gpt.conversation_history[0]['content'], "you are a helpful assistant")
+        chat_system = IntegrateChatGPT(use_history=True)
+        response = chat_system.get_response("Test Input")
 
-    def test_api_connection(self):
-        chat_gpt = IntegrateChatGPT(role="you are a helpful assistant", use_history=False)
-        try:
-            response = chat_gpt.get_response("hello")
-            self.assertIsInstance(response, str)  # Ensure the response is a string
-        except openai.error.AuthenticationError:
-            self.fail("API authentication failed!")  # This makes the test fail if this specific error is caught
+        self.assertEqual(response, "Mocked ChatGPT Response With History")
+        mock_get_response.assert_called_once()
 
 
-if __name__ == "__main__":
+class TestOllamaIntegration(unittest.TestCase):
+    @patch('ChattingGPT.components.ollama_functions.OllamaSystem._get_llm_response')
+    def test_ollama_without_history(self, mock_get_response):
+        # Mock the response from Ollama when not using history
+        mock_get_response.return_value = "Mocked Ollama Response Without History"
+
+        ollama_system = IntegrateOllama(use_history=False)
+        response = ollama_system.get_response("Test Input")
+
+        self.assertEqual(response, "Mocked Ollama Response Without History")
+        mock_get_response.assert_called_once()
+
+    @patch('ChattingGPT.components.ollama_functions.OllamaSystem._get_llm_response_with_history')
+    def test_ollama_with_history(self, mock_get_response):
+        # Mock the response from Ollama when using history
+        mock_get_response.return_value = "Mocked Ollama Response With History"
+
+        ollama_system = IntegrateOllama(use_history=True)
+        response = ollama_system.get_response("Test Input")
+
+        self.assertEqual(response, "Mocked Ollama Response With History")
+        mock_get_response.assert_called_once()
+
+
+if __name__ == '__main__':
     unittest.main()
