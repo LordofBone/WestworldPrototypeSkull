@@ -11,6 +11,7 @@ from components.chatbot_system import IntegrateChatGPT, IntegrateOllama
 
 
 class TestChatGPTIntegration(unittest.TestCase):
+    # todo: figure out why these tests can cause chatgpt api to still be activated, even though it's being mocked
     @patch('ChattingGPT.components.chatgpt_functions.ChatGPTSystem._get_chatgpt_response')
     def test_chatgpt_without_history(self, mock_get_response):
         # Mock the response from ChatGPT when not using history
