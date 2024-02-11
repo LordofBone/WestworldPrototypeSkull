@@ -279,6 +279,8 @@ For running the full system, run the following command:
 If you want to make some changes and need to test things are still working, or need to test the hardware has been set up
 correctly, then you can run the tests individually:
 
+**Be aware that some of these tests can activate APIs such as FakeYou and OpenAI, so be careful when running them, as it could incur costs.**
+
 ```sudo python tests/test_audio_jaw.py```
 
 ```sudo python tests/test_chatgpt.py```
