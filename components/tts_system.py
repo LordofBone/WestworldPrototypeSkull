@@ -52,7 +52,6 @@ class TTSOperationsOpenAI(AbstractTTSOperations):
             voice=openai_voice,
             input=text_input,
         )
-
         response.stream_to_file(self.filename)
 
 
@@ -68,6 +67,7 @@ class TTSOperationsFakeYou(AbstractTTSOperations):
 
 
 class TTSOperationsPyTTSx3(AbstractTTSOperations):
+    # todo: seems this can be buggy on repeat runs, may need to investigate, remove or find a workaround
     def __init__(self):
         self.engine = pyttsx3.init()
         self.voices = self.engine.getProperty('voices')
