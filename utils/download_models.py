@@ -5,7 +5,7 @@ from config.tts_config import determ_model_path, stoch_model_path
 
 def download_models():
     """
-    Download the models from Google Drive.
+    Download the Nix TTS models from Google Drive.
     :return:
     """
     print(determ_model_path)
