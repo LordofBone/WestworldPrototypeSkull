@@ -42,6 +42,9 @@ For the local Whisper STT installation:
 
 `pip install git+https://github.com/openai/whisper.git`
 
+and to update it:
+`pip install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git`
+
 ### Installing the Inventor Hat Mini library
 
 Library installation info [here](https://github.com/pimoroni/inventorhatmini-python#getting-the-library)
@@ -237,16 +240,21 @@ Each request to the OpenAI API will cost you money, so be careful with how many 
 You can set the variable `offline_mode` under config/stt_config to False if you wish to use the OpenAI API version 
 (will be considerably faster than the offline version, but of course will cost you money per inference).
 
+You can also change the size of the local model being used with the `model_size` variable; 
+the available_models are = ["tiny", "base", "small", "medium", "large"]
+
+As well as being able to adjust the silence threshold parameters.
+
 ### Configuring the TTS (Text to Speech)
 
-Under config/tts_config.py you can change the voice and speed of the TTS.
+Under config/tts_config.py you can change the TTS system that is being used and the voice for it.
+
+You can switch between the different TTS engines by changing the `tts_mode` variable to either pyttsx3, fakeyou, nix
+or openai.
 
 In order to use fakeyou you will need to set up an account [here](https://fakeyou.com/), copy
 config/fakeyou_config_template.py
 to config/fakeyou_config.py and add your login details and voice ID for the voice you want.
-
-You can switch between the different TTS engines by changing the `tts_mode` variable to either pyttsx3, fakeyou, nix
-or openai.
 
 ### Configuring ChattingGPT (Chatting with either ChatGPT or Ollama local LLM)
 
