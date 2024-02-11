@@ -41,7 +41,7 @@ class TestWhisperSTT(unittest.TestCase):
     def record_and_transcribe(self):
         # Record and transcribe
         print(f"Recording with {self.stt_runner.custom_name}...")
-        self.stt_runner.initiate_recording(max_seconds=20, silence_duration=2, silence_threshold=1000)
+        self.stt_runner.initiate_recording(max_seconds=20, silence_duration=3, silence_threshold=40)
         print(f"Finished recording with {self.stt_runner.custom_name}...")
         print(f"Inferencing with {self.stt_runner.custom_name}...")
         transcription = self.stt_runner.run_inference()
