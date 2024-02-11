@@ -20,7 +20,7 @@ def main():
 
     # Record and transcribe
     print("Recording...")
-    SpeechtoText.initiate_recording(max_seconds=20, silence_duration=2, silence_threshold=1000)
+    SpeechtoText.initiate_recording(max_seconds=60, silence_duration=3, silence_threshold=40)
     print("Finished recording")
 
     # Set and play audio file from location
