@@ -15,7 +15,7 @@ model_size = "tiny"
 recording_max_seconds = 60
 
 # silence duration until recording for STT stops, in seconds
-recording_silence_duration = 2
+recording_silence_duration = 3
 
 # silence threshold for STT recording
-recording_silence_threshold = 1000
+recording_silence_threshold = 40

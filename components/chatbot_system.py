@@ -3,8 +3,9 @@ from time import sleep
 
 from ChattingGPT.integrate_chatgpt import IntegrateChatGPT, IntegrateOllama
 from EventHive.event_hive_runner import EventActor
-from config.chattinggpt_config import openai_api_key, role, chat_backend, use_history, ollama_model
+from config.chattinggpt_config import role, chat_backend, use_history, ollama_model
 from config.custom_events import BotEvent, BotDoneEvent, ConversationDoneEvent
+from config.open_ai_config import open_ai_api_key
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -20,7 +21,7 @@ class ChatHandler:
 class RealChatHandler(ChatHandler):
     def __init__(self):
         if chat_backend == "gpt":
-            self.handler = IntegrateChatGPT(openai_api_key=openai_api_key, role=role, use_history=use_history)
+            self.handler = IntegrateChatGPT(openai_api_key=open_ai_api_key, role=role, use_history=use_history)
             logger.debug("ChatGPT handler initialized")
         elif chat_backend == "ollama":
             self.handler = IntegrateOllama(model=ollama_model, role=role, use_history=use_history)

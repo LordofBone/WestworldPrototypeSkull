@@ -11,8 +11,9 @@ from openai import OpenAI
 from EventHive.event_hive_runner import EventActor
 from config.custom_events import TTSEvent, ConversationDoneEvent
 from config.fakeyou_config import username, password, voice_model
-from config.tts_config import (tts_mode, nix_dir, audio_dir, file_name, stoch_model_path, pyttsx3_voice, openai_api_key,
-                               openai_model, openai_voice)
+from config.open_ai_config import open_ai_api_key
+from config.tts_config import (tts_mode, nix_dir, audio_dir, file_name, stoch_model_path, pyttsx3_voice, openai_model,
+                               openai_voice)
 
 sys.path.append(nix_dir)
 
@@ -42,7 +43,7 @@ class TTSOperationsNix(AbstractTTSOperations):
 class TTSOperationsOpenAI(AbstractTTSOperations):
     def __init__(self):
         self.client = OpenAI(
-            api_key=openai_api_key,
+            api_key=open_ai_api_key,
         )
         self.filename = f'{audio_dir}/{file_name}'
 
