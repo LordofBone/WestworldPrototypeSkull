@@ -219,9 +219,9 @@ And change the <USERHOME> to the user home where the code was cloned to.
 This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for
 some reason).
 
-## Local Whisper model setup
+## Nix TTS model setup
 
-To download the models required for running Whisper locally, run the following script:
+To download the models required for running Nix, run the following script:
 
 ```python setup_models.py```
 
