@@ -6,6 +6,7 @@ from EventHive.event_hive_runner import EventActor
 from config.command_config import override_word, de_override_word
 from config.custom_events import CommandCheckEvent, CommandCheckDoneEvent, ConversationDoneEvent
 from config.tts_config import test_command_text, shutdown_text, reboot_text, no_command_text
+from utils.string_ops import clean_text
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
@@ -24,17 +25,21 @@ class RealCommandOperations(CommandOperationsInterface):
         self.event_producer = event_producer
 
     def process_command(self, event_data):
-        if event_data == override_word:
+        # Clean and normalize both input and comparison strings
+        clean_event_data = clean_text(event_data)
+
+        if clean_event_data == override_word:
             self.event_producer(CommandCheckDoneEvent(["OVERRIDE_COMMAND_FOUND"], 1))
-        elif event_data == de_override_word:
+        elif clean_event_data == de_override_word:
             self.event_producer(CommandCheckDoneEvent(["DE_OVERRIDE_COMMAND_FOUND"], 1))
-        elif event_data in ["SHUTDOWN", "SHUT DOWN", "shutdown", "shut down", "power off", "poweroff", "turn off"]:
+        elif clean_event_data in ["SHUTDOWN", "SHUT DOWN", "shutdown", "shut down", "power off", "poweroff",
+                                  "turn off"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["shutdown_command", shutdown_text]], 1))
             logger.debug("Command checker finished, event output: SHUTDOWN")
-        elif event_data in ["REBOOT", "restart", "reboot", "restart now", "reboot now"]:
+        elif clean_event_data in ["REBOOT", "restart", "reboot", "restart now", "reboot now"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["reboot_command", reboot_text]], 1))
             logger.debug("Command checker finished, event output: REBOOT")
-        elif event_data in ["TEST", "test", "test command"]:
+        elif clean_event_data in ["TEST", "test", "test command"]:
             self.event_producer(CommandCheckDoneEvent(["COMMAND_FOUND", ["test_command", test_command_text]], 1))
             logger.debug("Command checker finished, event output: TEST COMMAND")
         else:
