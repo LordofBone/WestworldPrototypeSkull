@@ -321,8 +321,6 @@ correctly, then you can run the tests individually:
 
 ```sudo python tests/test_chatgpt.py```
 
-```sudo python tests/test_microwave_sensor.py```
-
 ```sudo python tests/test_tts.py```
 
 ```sudo python tests/test_whisper.py```
