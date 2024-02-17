@@ -227,14 +227,25 @@ To download the models required for running Nix, run the following script:
 
 ## Configuring the system
 
-### Setting the OpenAI API key
+### Setting the API keys
 
-Copy or rename 'config/open_ai_config_template.py' to 'config/open_ai_config.py' and add your own API
-key under `open_ai_api_key` to set the key for all the OpenAI API requests; TTS, STT and ChatGPT.
-from [OpenAI](https://platform.openai.com/)
+Make a file in the root of your project:
+
+```.env```
+
+And add the following line:
+```OPENAI_API_KEY=<your_api_key>```
+```FAKEYOU_USERNAME=<your_username>```
+```FAKEYOU_PASSWORD=<your_password>```
+```FAKEYOU_VOICE_MODEL_ID=<your_voice_model_id>```
+
+Adding your own API key from [OpenAI](https://platform.openai.com/)
 
 Here is a guide on how to get an API key from OpenAI: 
 [OpenAI API Key Guide](https://www.howtogeek.com/885918/how-to-get-an-openai-api-key/)
+
+In order to use fakeyou you will need to set up an account [here](https://fakeyou.com/) and add the username/password and voice ID of your
+choice to the .env file.
 
 Each request to the OpenAI API will cost you money, so be careful with how many requests you make.
 
@@ -254,10 +265,6 @@ Under config/tts_config.py you can change the TTS system that is being used and 
 
 You can switch between the different TTS engines by changing the `tts_mode` variable to either pyttsx3, fakeyou, nix
 or openai.
-
-In order to use fakeyou you will need to set up an account [here](https://fakeyou.com/), copy
-config/fakeyou_config_template.py
-to config/fakeyou_config.py and add your login details and voice ID for the voice you want.
 
 ### Configuring ChattingGPT (Chatting with either ChatGPT or Ollama local LLM)
 
