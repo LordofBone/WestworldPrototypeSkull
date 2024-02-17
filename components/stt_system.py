@@ -9,7 +9,6 @@ from Lakul.integrate_stt import SpeechtoTextHandler
 from config.audio_config import microphone_name
 from config.command_config import override_word, de_override_word
 from config.custom_events import STTEvent, STTDoneEvent, ConversationDoneEvent
-from config.open_ai_config import open_ai_api_key
 from config.stt_config import (profanity_censor_enabled, offline_mode, model_size, stt_audio_path,
                                recording_max_seconds, recording_silence_threshold, recording_silence_duration)
 
