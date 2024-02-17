@@ -33,7 +33,7 @@ class RealAudioDetectionHandler(AudioDetectionHandler):
         audio_engine_access().close_recording_stream(mic_key=self.audio_detector.mic_key)
 
     def audio_scan(self):
-        logger.debug(f"Audio scan enabled with detection threshold: {audio_input_detection_threshold}")
+        logger.info(f"Audio scan enabled with detection threshold: {audio_input_detection_threshold}")
 
         while True:
             if self.audio_detector.scan_mode_enabled:
@@ -41,7 +41,7 @@ class RealAudioDetectionHandler(AudioDetectionHandler):
                 audio_amplitude = np.frombuffer(audio_data, dtype=np.int16)
                 if np.max(audio_amplitude) > audio_input_detection_threshold:
                     self.audio_detector.produce_event(DetectEvent(["HUMAN_DETECTED"], 1))
-                    logger.debug(
+                    logger.info(
                         f"Sound detected with amplitude {np.max(audio_amplitude)} exceeding threshold "
                         f"{audio_input_detection_threshold}")
                     self.audio_detector.scan_mode_off()
