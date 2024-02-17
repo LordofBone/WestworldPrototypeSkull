@@ -14,6 +14,24 @@ found [here](https://www.hackster.io/314reactor/westworld-prototype-skull-6ee7d9
 
 Software runs on RPi OS Bullseye (64-bit)
 
+It's also a good idea to increase the swap size to 2048MB to prevent the RPi from running out of memory:
+
+```sudo dphys-swapfile swapoff```
+
+```sudo nano /etc/dphys-swapfile```
+
+and set:
+
+```CONF_SWAPSIZE=2048```
+
+Then run:
+
+```sudo dphys-swapfile setup```
+
+```sudo dphys-swapfile swapon```
+
+Full instructions for changing swap can be found [here](https://pimylifeup.com/raspberry-pi-swap-file/)
+
 ### Cloning the repository
 
 Navigate to your home directory and clone the repository:
