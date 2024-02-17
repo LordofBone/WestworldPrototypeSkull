@@ -30,8 +30,7 @@ class RealSTTHandler(STTHandlerInterface):
     def __init__(self):
         self.STT_handler = SpeechtoTextHandler(stt_microphone_name=microphone_name, stt_audio_file=stt_audio_path,
                                                stt_offline_mode=offline_mode, stt_model_size=model_size,
-                                               stt_api_key=open_ai_api_key, init_on_launch=False,
-                                               custom_name="Real STT")
+                                               init_on_launch=False, custom_name="Real STT")
         self.STT_handler.init_models()
 
     def initiate_recording(self, max_seconds=recording_max_seconds, silence_threshold=recording_silence_threshold,

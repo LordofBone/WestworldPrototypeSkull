@@ -20,7 +20,7 @@ class ChatHandler:
 class RealChatHandler(ChatHandler):
     def __init__(self):
         if chat_backend == "gpt":
-            self.handler = IntegrateChatGPT(openai_api_key=open_ai_api_key, role=role, use_history=use_history)
+            self.handler = IntegrateChatGPT(role=role, use_history=use_history)
             logger.debug("ChatGPT handler initialized")
         elif chat_backend == "ollama":
             self.handler = IntegrateOllama(model=ollama_model, role=role, use_history=use_history)
