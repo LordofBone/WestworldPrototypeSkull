@@ -9,9 +9,8 @@ from fakeyou.fakeyou import FakeYou
 from openai import OpenAI
 
 from EventHive.event_hive_runner import EventActor
+from components.fakeyou_api import username, password, voice_model
 from config.custom_events import TTSEvent, ConversationDoneEvent
-from config.fakeyou_config import username, password, voice_model
-from config.open_ai_config import open_ai_api_key
 from config.tts_config import (tts_mode, nix_dir, audio_dir, file_name, stoch_model_path, pyttsx3_voice, openai_model,
                                openai_voice)
 

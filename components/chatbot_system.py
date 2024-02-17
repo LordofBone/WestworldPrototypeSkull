@@ -5,7 +5,6 @@ from ChattingGPT.integrate_chatgpt import IntegrateChatGPT, IntegrateOllama
 from EventHive.event_hive_runner import EventActor
 from config.chattinggpt_config import role, chat_backend, use_history, ollama_model
 from config.custom_events import BotEvent, BotDoneEvent, ConversationDoneEvent
-from config.open_ai_config import open_ai_api_key
 
 logger = logging.getLogger(__name__)
 logger.debug("Initialized")
