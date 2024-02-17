@@ -127,7 +127,7 @@ class AudioJawSync(EventActor):
             return True
 
     def audio_to_jaw_movement(self, event_type=None, event_data=None):
-        logger.debug("Audio to jaw movement")
+        logger.info("Playing audio and moving jaw in sync with audio")
 
         try:
             if event_data is None:
@@ -152,6 +152,7 @@ class AudioJawSync(EventActor):
         finally:
             self.analyzing = False
             self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
+            logger.info("Audio to jaw movement finished")
             return True
 
     def get_event_handlers(self):
