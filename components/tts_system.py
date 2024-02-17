@@ -109,8 +109,9 @@ class TTSOperations(EventActor):
         logger.debug(f"Initialized with TTS mode: {self.tts.__class__.__name__}")
 
     def generate_tts(self, event_type=None, event_data=None):
-        logger.debug(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")
+        logger.info(f"Generating TTS with event data: {event_data} using tts_mode: {tts_mode}")
         self.tts.generate_tts(event_data)
+        logger.info(f"TTS generated and saved to: {self.filename}")
         self.produce_event(ConversationDoneEvent(["CONVERSATION_ACTION_FINISHED"], 1))
         return True
 
