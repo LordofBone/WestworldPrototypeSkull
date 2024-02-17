@@ -3,10 +3,9 @@ misc/*
 audio/*
 !audio/jaw_test.wav
 !audio/whisper_test.wav
+.env
 __pycache__
 models/deterministic/*
 !models/deterministic/.gitkeep
 models/stochastic/*
 !models/stochastic/.gitkeep
-config/fakeyou_config.py
-config/open_ai_config.py
