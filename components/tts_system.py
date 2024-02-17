@@ -1,12 +1,18 @@
 import importlib
 import logging
+import os
 import sys
 from abc import ABC, abstractmethod
 
 import pyttsx3
 import soundfile as sf
+from dotenv import load_dotenv
 from fakeyou.fakeyou import FakeYou
 from openai import OpenAI
+
+load_dotenv()
+
+open_ai_api_key = os.getenv("OPENAI_API_KEY")
 
 from EventHive.event_hive_runner import EventActor
 from components.fakeyou_api import username, password, voice_model
