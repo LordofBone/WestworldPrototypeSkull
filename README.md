@@ -4,8 +4,7 @@ This guide will walk you through the process of setting up the Westworld Prototy
 
 ## Prerequisites
 
-- Raspberry Pi with Raspbian or a similar OS installed.
-- ALSA utilities installed (usually pre-installed with Raspbian).
+- Raspberry Pi with Raspbian Bullseye 64 bit installed, use the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) to install the OS on a microSD card.
 
 ## Hardware/Code setup
 
@@ -44,24 +43,38 @@ Navigate to your home directory and clone the repository:
 
 ## Installing dependencies
 
-You can install the dependencies in a virtual environment:
+Prior to installing python dependencies it's a good idea to update the system:
 
-```sudo apt-get install virtualenv```
+```sudo apt-get update```
+
+```sudo apt-get upgrade```
+
+And also install:
+
+```sudo apt install python3-pyaudio portaudio19-dev python3-gst-1.0 espeak alsa-utils virtualenv```
+
+As well as ensure pip is up-to-date:
+
+```sudo pip3 install --upgrade pip```
+
+You can install the python dependencies in a virtual environment (optional):
 
 ```virtualenv venv```
 
 ```source venv/bin/activate```
 
-```sudo pip install -r requirements.txt```
+Or you can install the dependencies globally and skip the virtual environment step:
+
+```sudo pip3 install -r requirements.txt```
 
 (Needs to be run as sudo as the Inventor HAT Mini library below requires it)
 
 For the local Whisper STT installation:
 
-`pip install git+https://github.com/openai/whisper.git`
+`sudo pip3 install git+https://github.com/openai/whisper.git`
 
 and to update it:
-`pip install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git`
+`sudo pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git`
 
 ### Installing the Inventor Hat Mini library
 
@@ -74,10 +87,6 @@ It's also worth disabling HDMI audio out to prevent the audio from playing throu
 ```sudo nano /boot/config.txt```
 
 Change line "dtoverlay=vc4-kms-v3d" to "dtoverlay=vc4-kms-v3d,noaudio" and reboot.
-
-And finally install:
-
-```sudo apt install python3-gst-1.0```
 
 Also ensure I2C is enabled on the Raspberry Pi:
 
@@ -99,11 +108,13 @@ Guide for installing Ollama on Linux [here](https://ollama.ai/download/linux)
 
 Then to download the LLM and configure it, run:
 
-```./setup/build_llm.sh```
+```cd setup```
 
-### Installing e-speak (for TTS)
+```sudo chmod +x build_llm.sh```
 
-```sudo apt-get install espeak```
+```./build_llm.sh```
+
+This will build the model `westworld-prototype` with the configuration from the Modelfile.
 
 ## Audio setup
 
@@ -205,6 +216,12 @@ to:
 
 ```dtparam=audio=off```
 
+If you haven't already done it from the Inventor Hat Mini library installation above, add the following to the 
+config.txt file as well:
+
+```dtoverlay=hifiberry-dac```
+```gpio=25=op,dh```
+
 ### 6. Reboot
 
 Reboot the Raspberry Pi:
@@ -234,6 +251,8 @@ Copy setup/rc.local to /etc/rc.local
 
 And change the <USERHOME> to the user home where the code was cloned to.
 
+```sudo nano /etc/rc.local```
+
 This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for
 some reason).
 
@@ -247,7 +266,7 @@ To download the models required for running Nix, run the following script:
 
 ### Setting the API keys
 
-Make a file in the root of your project:
+Make a file in the root of the project:
 
 ```.env```
 
@@ -297,14 +316,6 @@ defaults to a newly made Westworld host prototype.
 
 You can also adjust the `use_history` variable to enable a more conversational chatbot for either GPT or Ollama.
 
-You can set up the chatbot by going to the `setup` folder and running:
-
-```sudo chmod +x build_llm.sh```
-
-```./build_llm.sh```
-
-This will build the model `westworld-prototype` with the configuration from the Modelfile.
-
 You can also modify the Modelfile to change parameters such as the role and the length of responses (this is currently
 set to 8 tokens so that it doesn't take too long on a RPi Zero 2W, but you can increase this if you have a more powerful
 device).
@@ -348,3 +359,14 @@ Or, run the entire suite:
 ```sudo python test_suite.py```
 
 These all need to be run as sudo as the Inventor HAT Mini library requires it.
+
+You can also run a demo mode which will just make the skull loop through TTS with the jaw movement:
+
+```sudo python activate.py --demo_mode```
+
+And there is also a test mode which can work in normal mode or demo mode, which will loop through all the conversation
+actions without actually activating TTS, STT or APIs, this is a kind of 'dry run' test:
+
+```sudo python activate.py --test_mode```
+
+You can see it loop through until exited with Ctrl+C.
