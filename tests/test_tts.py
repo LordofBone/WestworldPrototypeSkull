@@ -8,7 +8,7 @@ from playsound import playsound
 top_dir = Path(__file__).parent.parent
 
 sys.path.append(str(top_dir))
-from components.tts_system import TTSOperationsNix, TTSOperationsOpenAI, TTSOperationsPyTTSx3, TTSOperationsFakeYou
+from components.tts_system import TTSOperationsNix, TTSOperationsPyTTSx3
 
 
 class TestTTSSystems(unittest.TestCase):
