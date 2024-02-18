@@ -98,7 +98,7 @@ It's also a good idea to use alsamixer to adjust the volume of the microphone:
 
 ```alsamixer```
 
-Hit F4 to go to the capture screen.
+Hit F4 to go to the capture device and set it to around 42% (at the top of the green part of the bar).
 
 Find the USB PnP Sound Device and adjust to volume to around 30% and then hit ESC to exit.
 
