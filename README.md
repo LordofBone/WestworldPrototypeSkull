@@ -220,6 +220,7 @@ If you haven't already done it from the Inventor Hat Mini library installation a
 config.txt file as well:
 
 ```dtoverlay=hifiberry-dac```
+
 ```gpio=25=op,dh```
 
 ### 6. Reboot
@@ -272,8 +273,11 @@ Make a file in the root of the project:
 
 And add the following line:
 ```OPENAI_API_KEY=<your_api_key>```
+
 ```FAKEYOU_USERNAME=<your_username>```
+
 ```FAKEYOU_PASSWORD=<your_password>```
+
 ```FAKEYOU_VOICE_MODEL_ID=<your_voice_model_id>```
 
 Adding your own API key from [OpenAI](https://platform.openai.com/)
