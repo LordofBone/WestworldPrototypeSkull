@@ -2,9 +2,11 @@
 
 This guide will walk you through the process of setting up the Westworld Prototype Skull on a Raspberry Pi.
 
+
 ## Prerequisites
 
 - Raspberry Pi with Raspbian Bullseye 64 bit installed, use the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) to install the OS on a microSD card.
+
 
 ## Hardware/Code setup
 
@@ -41,7 +43,7 @@ Navigate to your home directory and clone the repository:
 
 ```cd WestworldPrototypeSkull```
 
-## Installing dependencies
+### Installing dependencies
 
 Prior to installing python dependencies it's a good idea to update the system:
 
@@ -115,6 +117,7 @@ Then to download the LLM and configure it, run:
 ```./build_llm.sh```
 
 This will build the model `westworld-prototype` with the configuration from the Modelfile.
+
 
 ## Audio setup
 
@@ -244,7 +247,7 @@ to the speakers:
 
 ```sudo python mic_quality_check.py```
 
-## Startup script
+### Startup script
 
 Copy setup/rc.local to /etc/rc.local
 
@@ -257,11 +260,12 @@ And change the <USERHOME> to the user home where the code was cloned to.
 This sets up the 'close_jaw.py' script to run on startup (which is required because on boot the servo opens the jaw for
 some reason).
 
-## Nix TTS model setup
+### Nix TTS model setup
 
 To download the models required for running Nix, run the following script:
 
 ```python setup_models.py```
+
 
 ## Configuring the system
 
@@ -333,6 +337,7 @@ Then setting:
 
 ```ollama_model = "llama2"```
 
+
 ## Running the code
 
 To run a demo mode where the skull will just say some pre-defined phrases, run the following command:
@@ -342,6 +347,7 @@ To run a demo mode where the skull will just say some pre-defined phrases, run t
 For running the full system, run the following command:
 
 ```sudo python activate.py```
+
 
 ## Running tests
 
@@ -374,3 +380,13 @@ actions without actually activating TTS, STT or APIs, this is a kind of 'dry run
 ```sudo python activate.py --test_mode```
 
 You can see it loop through until exited with Ctrl+C.
+
+
+## Contributing
+
+Contributions to the project are welcome! Please fork the repository and submit a pull request with your changes.
+
+
+## License
+
+This project is licensed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html).
