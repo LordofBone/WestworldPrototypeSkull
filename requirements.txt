@@ -44,7 +44,7 @@ pytools==2023.1
 PyYAML==6.0
 regex==2022.10.31
 requests==2.32.2
-scikit-learn==1.2.2
+scikit-learn==1.5.0
 scipy==1.9.3
 smbus2==0.4.3
 sounddevice==0.4.6
