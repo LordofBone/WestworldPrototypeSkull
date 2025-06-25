@@ -19,7 +19,7 @@ gpiozero==1.6.2
 huggingface-hub==0.11.0
 idna==3.7
 joblib==1.2.0
-langchain_community==0.0.20
+langchain_community==0.2.19
 lazy_loader==0.2
 librosa==0.10.0.post2
 llvmlite==0.40.1rc1
